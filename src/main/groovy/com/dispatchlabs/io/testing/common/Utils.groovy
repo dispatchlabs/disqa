@@ -80,7 +80,7 @@ public class Utils {
     }
 
     public static sign(String privateKey,String hash){
-        Process proc = "${System.getenv("SIGN_EXE_DIR")}\\sign.exe ${privateKey} ${hash}".execute(null, new File(System.getenv("SIGN_EXE_DIR")))
+        Process proc = "${System.getenv("SIGN_EXE_DIR")}\\sign.exe ${privateKey} ${hash}".execute([], new File(System.getenv("SIGN_EXE_DIR")))
         proc.waitFor()
         return proc.text
     }
