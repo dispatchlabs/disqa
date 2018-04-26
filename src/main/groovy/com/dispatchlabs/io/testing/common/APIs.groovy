@@ -65,7 +65,7 @@ class APIs {
         while (timeout>0){
             RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
             request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
-            Response response = request.get("/vi/status/"+params.ID)
+            Response response = request.get("/v1/statuses/"+params.ID)
             response.then().log().all()
             if(response.then().statusCode(200).extract().path("status") == params.Status) return
             sleep(1000)
@@ -79,7 +79,7 @@ class APIs {
         params.Nodes.each{Node->
             RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
             request.baseUri("http://"+Node.IP+":"+Node.HttpPort)
-            Response response = request.get("/vi/accounts/"+params.ID)
+            Response response = request.get("/v1/accounts/"+params.ID)
             response.then().log().all()
             if(params.Status)
                 response.then().assertThat().body("status",equalTo(params.Status))
@@ -92,7 +92,7 @@ class APIs {
         params.Nodes.each{Node->
             RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
             request.baseUri("http://"+Node.IP+":"+Node.HttpPort)
-            Response response = request.get("/vi/statuses/"+params.ID)
+            Response response = request.get("/v1/statuses/"+params.ID)
             response.then().log().all()
             if(params.Status)
                 response.then().assertThat().body("status",equalTo(params.Status))
