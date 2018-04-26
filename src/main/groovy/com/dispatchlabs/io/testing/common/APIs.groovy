@@ -76,7 +76,7 @@ class APIs {
     }
 
     public static verifyConsensusForAccount(def params){
-        params.Nodes.each{Node->
+        params.Nodes.each{Name,Node->
             RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
             request.baseUri("http://"+Node.IP+":"+Node.HttpPort)
             Response response = request.get("/v1/accounts/"+params.ID)
