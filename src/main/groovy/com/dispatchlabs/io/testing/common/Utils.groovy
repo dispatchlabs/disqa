@@ -88,7 +88,10 @@ public class Utils {
             return proc.text
         }
         else{
-            return NativeSecp256k1.sign(DatatypeConverter.parseHexBinary(privateKey),DatatypeConverter.parseHexBinary(hash))
+            Process proc = "${System.getenv("SIGN_EXE_DIR")}/sign ${privateKey} ${hash}".execute([], new File(System.getenv("SIGN_EXE_DIR")))
+            proc.waitFor()
+            return proc.text
+            //return NativeSecp256k1.sign(DatatypeConverter.parseHexBinary(privateKey),DatatypeConverter.parseHexBinary(hash))
         }
     }
 
