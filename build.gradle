@@ -20,6 +20,7 @@ dependencies {
 
 test {
     useTestNG()
+    systemProperty "java.library.path", "${buildDir}/main/resources"
     //include 'com.dispatchlabs.io.testing/*'
     testLogging {
         exceptionFormat "full"

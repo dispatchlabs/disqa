@@ -12,7 +12,9 @@ import com.jayway.restassured.specification.RequestSpecification
 import javax.xml.bind.DatatypeConverter;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.nio.ByteOrder
+import java.util.concurrent.locks.Lock
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -80,9 +82,14 @@ public class Utils {
     }
 
     public static sign(String privateKey,String hash){
-        Process proc = "${System.getenv("SIGN_EXE_DIR")}\\sign.exe ${privateKey} ${hash}".execute([], new File(System.getenv("SIGN_EXE_DIR")))
-        proc.waitFor()
-        return proc.text
+        if(System.getProperty("os.name").toLowerCase().contains("win")){
+            Process proc = "${System.getenv("SIGN_EXE_DIR")}\\sign.exe ${privateKey} ${hash}".execute([], new File(System.getenv("SIGN_EXE_DIR")))
+            proc.waitFor()
+            return proc.text
+        }
+        else{
+            return NativeSecp256k1.sign(DatatypeConverter.parseHexBinary(privateKey),DatatypeConverter.parseHexBinary(hash))
+        }
     }
 
     public static setupRestAssured(){
@@ -91,6 +98,5 @@ public class Utils {
 
         RestAssured.requestSpecification = requestSpecification
     }
-
 }
 
