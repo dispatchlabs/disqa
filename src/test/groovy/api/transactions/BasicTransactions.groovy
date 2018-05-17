@@ -1,6 +1,7 @@
 package api.transactions
 
 import com.dispatchlabs.io.testing.common.NodeSetup
+import com.dispatchlabs.io.testing.common.Utils
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 
@@ -8,6 +9,7 @@ import static com.dispatchlabs.io.testing.common.APIs.*
 
 class BasicTransactions {
     def allNodes
+    def delegates
 
     @BeforeMethod
     public void baseState(){
@@ -19,9 +21,10 @@ class BasicTransactions {
     //Send basic genesis transaction
     //Verify consensus on all nodes
     public void basicTest(){
-        def response = sendTransaction Node:allNodes.Delegate0, Value:999, PrivateKey:"Genesis",
-                To:allNodes.Delegate0.walletID ,From: "Genesis"
-        waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegate0, Status: "OK", Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes, ID:allNodes.Delegate0.walletID, Status: "OK", Balance: 999
+        println Utils.createAccount()
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.walletID ,From: "Genesis"
+        waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.walletID, Status: "Ok", Balance: 999
     }
 }
