@@ -18,7 +18,7 @@ class APIs {
 
         String privateKey
         if(params.PrivateKey == "Genesis")
-            privateKey = NodeSetup.genWalletID
+            privateKey = NodeSetup.genPrivateKey
         else
             privateKey = params.From
 

@@ -10,9 +10,12 @@ class NodeSetup {
     private static portRange = [3500,4000]
     private static int lastPort = 0
     private static thisIP = "127.0.0.1"
-    public static genPrivateKey = "646449644112bd02641a9e5ca3fa6070ddc1af072210b77dda5e38b203a95033"
-    public static genWalletID = "937db6dc29984f3887dff2d2524b29e8ac2579b1"
-    private static genTransaction = '''{\"hash\":\"da9ac662faf0a353d210b39fc1fbd44aadb470bfb7abceceec15bede74df21b2\",\"type\":0,\"from\":\"f74abc9a20c64bd04398fd5037f48811be57b645\",\"fromName\":null,\"to\":\"937db6dc29984f3887dff2d2524b29e8ac2579b1\",\"toName\":null,\"value\":1000000000,\"time\":0,\"signature\":\"536d4cd992501ef410d5d981651cbb8823140b3a8271a88d8e7d55e5de1304b76cd62a9882674870586fa0616554c64a6f214ece4f6a8cb7ab862e7c26ae8a0e00\"}'''
+    public static genPrivateKey = "0f86ea981203b26b5b8244c8f661e30e5104555068a4bd168d3e3015db9bb25a"
+    //public static genPrivateKey = "d3386ee62b2cf413abf5d5a109e0cf97ba158a33ede5efb9cb0d75a68e74bc51"
+    public static genWalletID = "3ed25f42484d517cdfc72cafb7ebc9e8baa52c2c"
+    //public static genWalletID = "937db6dc29984f3887dff2d2524b29e8ac2579b1"
+    private static genTransaction = "{\"hash\":\"a48ff2bd1fb99d9170e2bae2f4ed94ed79dbc8c1002986f8054a369655e29276\",\"type\":0,\"from\":\"e6098cc0d5c20c6c31c4d69f0201a02975264e94\",\"to\":\"3ed25f42484d517cdfc72cafb7ebc9e8baa52c2c\",\"value\":10000000,\"data\":\"\",\"time\":0,\"signature\":\"03c1fdb91cd10aa441e0025dd21def5ebe045762c1eeea0f6a3f7e63b27deb9c40e08b656a744f6c69c55f7cb41751eebd49c1eedfbd10b861834f0352c510b200\",\"hertz\":0,\"fromName\":\"\",\"toName\":\"\"}"
+    //private static genTransaction = '''{\"hash\":\"da9ac662faf0a353d210b39fc1fbd44aadb470bfb7abceceec15bede74df21b2\",\"type\":0,\"from\":\"f74abc9a20c64bd04398fd5037f48811be57b645\",\"fromName\":null,\"to\":\"937db6dc29984f3887dff2d2524b29e8ac2579b1\",\"toName\":null,\"value\":1000000000,\"time\":0,\"signature\":\"536d4cd992501ef410d5d981651cbb8823140b3a8271a88d8e7d55e5de1304b76cd62a9882674870586fa0616554c64a6f214ece4f6a8cb7ab862e7c26ae8a0e00\"}'''
 
 
     public static def quickSetup(def params){
@@ -20,24 +23,31 @@ class NodeSetup {
         File exeLocation = new File(System.getenv("TEST_EXE_LOCATION"))
 
         def allNodes = [:]
+        def returnNodes = [:]
         if(params.Seed){
+            returnNodes.Seeds = [:]
             params.Seed.times{
-                allNodes["Seed$it"] = [IsDelegate:false,IsSeed:true]
+                returnNodes.Seeds["Seed$it"] = [IsDelegate:false,IsSeed:true]
+                allNodes["Seed$it"] = returnNodes.Seeds["Seed$it"]
             }
         }
         if(params.Delegate){
+            returnNodes.Delegates = [:]
             params.Delegate.times{
-                allNodes["Delegate$it"] = [IsDelegate:true,IsSeed:false]
+                returnNodes.Delegates["Delegate$it"] = [IsDelegate:true,IsSeed:false]
+                allNodes["Delegate$it"] = returnNodes.Delegates["Delegate$it"]
             }
         }
         if(params.Regular) {
+            returnNodes.Regulars = [:]
             params.Regular.times {
-                allNodes["Regular$it"] = [IsDelegate: false, IsSeed: false]
+                returnNodes.Regulars["Regular$it"] = [IsDelegate: false, IsSeed: false]
+                allNodes["Regular$it"] = returnNodes.Regulars["Regular$it"]
             }
         }
         setupNodes(allNodes,directory,exeLocation)
         println JsonOutput.prettyPrint(JsonOutput.toJson(allNodes))
-        return allNodes
+        return returnNodes
     }
 
     public static void setupNodes(def nodeSetup,File directory,File exeLocation){
@@ -63,22 +73,22 @@ class NodeSetup {
             setup.GrpcPort = lastPort+1
             lastPort = lastPort+2
             if(setup.IsDelegate == true) allDelegates << "127.0.0.1:$setup.GrpcPort"
-            if(setup.IsSeed == true) allSeeds << "127.0.0.1:$setup.GrpcPort"
+            if(setup.IsSeed == true) allSeeds << [host:"127.0.0.1",port:setup.GrpcPort]
         }
 
         nodeSetup.each{nodeID,setup->
             def config = [
-                    "HttpPort": setup.HttpPort,
-                    "HttpHostIp": setup.IP,
-                    "GrpcPort": setup.GrpcPort,
-                    "GrpcTimeout": 5,
-                    "UseQuantumEntropy": false,
-                    "IsSeed": setup.IsSeed,
-                    "IsDelegate": setup.IsDelegate,
-                    "SeedList": allSeeds,
-                    "DaposDelegates": allDelegates,
-                    "NodeId": nodeID,
-                    "ThisIp": setup.IP+":"+setup.GrpcPort,
+                    httpEndpoint:[
+                            host:setup.IP,
+                            port:setup.HttpPort
+                    ],
+                    grpcEndpoint:[
+                            host:setup.IP,
+                            port:setup.GrpcPort
+                    ],
+                    "grpcTimeout": 5,
+                    "useQuantumEntropy": false,
+                    "seedEndpoints": allSeeds,
                     "genesisTransaction":genTransaction
             ]
             config = JsonOutput.toJson(config)

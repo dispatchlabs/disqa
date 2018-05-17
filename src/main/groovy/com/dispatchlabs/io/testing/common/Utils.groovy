@@ -8,6 +8,7 @@ import com.jayway.restassured.config.SSLConfig
 import com.jayway.restassured.filter.log.LogDetail
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.specification.RequestSpecification
+import org.bouncycastle.jcajce.provider.digest.Keccak
 
 import javax.xml.bind.DatatypeConverter;
 import java.math.BigInteger;
@@ -19,6 +20,28 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import static com.google.common.base.Preconditions.checkArgument;
 
 public class Utils {
+
+    public static createAccount(){
+        Key key = new Key()
+        byte[] publicKey = key.getPublicKeyBytes()
+
+        System.out.println(toHexString(publicKey))
+
+
+        byte[] hashablePublicKey = new byte[publicKey.length-1]
+        for (int i=1; i<publicKey.length; i++) {
+            hashablePublicKey[i-1] = publicKey[i]
+        }
+        byte[] hash = hash(hashablePublicKey)
+        byte[] address = new byte[20]
+        for (int i=0; i<address.length; i++) {
+            address[i] = hash[i+12]
+        }
+        def account = [:]
+        account.address = toHexString(address)
+        account.privateKey = key.getPrivateKey()
+        return account
+    }
 
     /**
      * <p>
@@ -100,6 +123,12 @@ public class Utils {
                 setAccept(ContentType.JSON).build()
 
         RestAssured.requestSpecification = requestSpecification
+    }
+
+    public static byte[] hash(byte[] bytes) {
+        final Keccak.Digest256 keccak = new Keccak.Digest256();
+        keccak.update(bytes);
+        return keccak.digest();
     }
 }
 
