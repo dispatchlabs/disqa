@@ -20,11 +20,11 @@ class APIs {
         if(params.PrivateKey == "Genesis")
             privateKey = NodeSetup.genPrivateKey
         else
-            privateKey = params.From
+            privateKey = params.PrivateKey
 
         String from
         if(params.From == "Genesis")
-            from = NodeSetup.genWalletID
+            from = NodeSetup.genAddress
         else
             from = params.From
 
@@ -88,7 +88,7 @@ class APIs {
         }
     }
 
-    public static verifyConsensusForTransaction(def params){
+    public static verifyStatusForTransaction(def params){
         params.Nodes.each{Node->
             RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
             request.baseUri("http://"+Node.IP+":"+Node.HttpPort)
@@ -99,6 +99,34 @@ class APIs {
             if(params.Balance)
                 response.then().assertThat().body("data.balance",equalTo(params.Balance))
         }
+    }
+
+    public static verifyDelegates(def params){
+        RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
+        request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
+        Response response = request.get("/v1/delegates")
+        response.then().log().all()
+        println("test")
+        params.Delegates.each{Name,Delegate->
+            println(Delegate.address)
+            response.then().assertThat().body("data.address",hasItem(Delegate.address))
+        }
+    }
+
+    public static verifyTransactionsByFrom(def params){
+        RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
+        request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
+        Response response = request.get("/v1/transactions/from/"+params.Address)
+        response.then().log().all()
+
+    }
+
+    public static verifyTransactionsByTo(def params){
+        RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
+        request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
+        Response response = request.get("/v1/transactions/to/"+params.Address)
+        response.then().log().all()
+
     }
 
 }
