@@ -6,9 +6,11 @@ import com.jayway.restassured.response.Response
 import com.jayway.restassured.specification.RequestSpecification
 import org.bouncycastle.jcajce.provider.digest.Keccak
 import org.bouncycastle.util.encoders.Hex
-import static org.hamcrest.Matchers.*;
 
 import javax.xml.bind.DatatypeConverter
+
+import static org.hamcrest.Matchers.equalTo
+import static org.hamcrest.Matchers.hasItem
 
 class APIs {
 
@@ -30,6 +32,7 @@ class APIs {
 
         String to = params.To
         long value = params.Value
+        //double value = params.Value
         long time
         if(params.Time)
             time = params.Time
@@ -40,6 +43,7 @@ class APIs {
         byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(from));
         byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(to));
         byteArrayOutputStream.write(Utils.longToBytes(value));
+        //byteArrayOutputStream.write(Utils.doubleToBytes(value));
         byteArrayOutputStream.write(Utils.longToBytes(time));
 
         Keccak.Digest256 digestSHA3 = new Keccak.Digest256();
@@ -52,6 +56,34 @@ class APIs {
                 .log().all()
         Response response = request.post("/v1/transactions")
         response.then().log().all()
+
+        //Verify response (optional)
+        if(params.Status)
+            response.then().assertThat().body("status",equalTo(params.Status))
+
+        return response
+    }
+
+    public static customAPICall(def params){
+        RequestSpecification request = RestAssured.given()
+        request.baseUri("http://"+params.IP+":"+params.HttpPort)
+
+        request.contentType(ContentType.JSON)
+                .body(params.Body)
+                .log().all()
+        Response response = request.post(params.API)
+        response.then().log().all()
+
+        //Verify response (optional)
+        if(params.Status) {
+            response.then().assertThat().body("status", equalTo(params.Status))
+        }
+
+        //Verify return code (optional)
+        if(params.StatusCode){
+            response.then().statusCode(params.StatusCode)
+        }
+
         return response
     }
 
@@ -106,7 +138,6 @@ class APIs {
         request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
         Response response = request.get("/v1/delegates")
         response.then().log().all()
-        println("test")
         params.Delegates.each{Name,Delegate->
             println(Delegate.address)
             response.then().assertThat().body("data.address",hasItem(Delegate.address))

@@ -19,15 +19,10 @@ class BasicTransactions {
 
     @Test(description="Genesis to Delegate transaction and verify consensus on all nodes",groups = ["smoke", "transactions"])
     public void transactions1_GenesisToDelegate(){
-        def i = 20
-        while(i != 0) {
-            def response = sendTransaction Node: allNodes.Delegates.Delegate1, Value: 999, PrivateKey: "Genesis",
-                    To: allNodes.Delegates.Delegate0.address, From: "Genesis"
-            waitForTransactionStatus ID: response.then().extract().path("id"), Node: allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-            sleep(2000)
-            i--
-            //verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 999
-        }
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:999, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+        waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 999
     }
 
     @Test(description="Genesis to new Account transaction and verify consensus on all nodes",groups = ["smoke", "transactions"])

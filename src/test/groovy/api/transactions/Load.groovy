@@ -32,5 +32,7 @@ class Load {
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok"
+
+        sleep(500)
     }
 }
