@@ -6,14 +6,11 @@ import com.jayway.restassured.RestAssured
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Response
 import com.jayway.restassured.specification.RequestSpecification
-import groovy.json.JsonOutput
 import org.bouncycastle.jcajce.provider.digest.Keccak
 import org.bouncycastle.util.encoders.Hex
-import org.testng.annotations.Test
 
 import javax.xml.bind.DatatypeConverter
 
-import static com.dispatchlabs.io.testing.common.APIs.*
 import static org.hamcrest.Matchers.equalTo
 
 class InvalidTransactions {
@@ -64,7 +61,7 @@ class InvalidTransactions {
 
         return response
     }
-
+    /*
     @Test(description="Invalid transaction",groups = ["smoke", "transactions"])
     public void transactionRegression7_DelegateNegativeTokens(){
 
@@ -86,4 +83,5 @@ class InvalidTransactions {
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 999
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 999
     }
+    */
 }
