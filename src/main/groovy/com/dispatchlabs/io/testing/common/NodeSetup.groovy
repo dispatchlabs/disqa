@@ -19,6 +19,7 @@ class NodeSetup {
 
 
     public static def quickSetup(def params){
+        sleep(1000)
         File directory = new File(System.getenv("NODES_DIR"))
         File exeLocation = new File(System.getenv("TEST_EXE_LOCATION"))
 
