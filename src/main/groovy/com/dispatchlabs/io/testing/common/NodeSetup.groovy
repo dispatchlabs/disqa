@@ -19,7 +19,6 @@ class NodeSetup {
 
 
     public static def quickSetup(def params){
-        sleep(1000)
         File directory = new File(System.getenv("NODES_DIR"))
         File exeLocation = new File(System.getenv("TEST_EXE_LOCATION"))
 
@@ -52,6 +51,7 @@ class NodeSetup {
     }
 
     public static void setupNodes(def nodeSetup,File directory,File exeLocation){
+        sleep(1000)
         if(lastPort == 0) lastPort = portRange[0]
         assert lastPort < portRange[1],"Error: out of ports!"
         if(System.getProperty("os.name").toLowerCase().contains("win")){
@@ -60,6 +60,7 @@ class NodeSetup {
         else{
             "pkill disgo".execute().waitFor()
         }
+        sleep(2000)
         if(directory.exists()){
             directory.deleteDir()
             directory.mkdirs()
