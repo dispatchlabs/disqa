@@ -100,11 +100,12 @@ class NodeSetup {
                 exeName = "disgo.exe"
             }
             Files.copy(exeLocation.toPath(),new File(basePath+"/$exeName").toPath())
-            setup.procBuilder = new ProcessBuilder(basePath+"/$exeName")
+            setup.startProcess = {return new ProcessBuilder(basePath+"/$exeName")
                     .directory(new File(basePath))
                     .redirectOutput(new File(basePath+'/output.log'))
-                    .redirectErrorStream(true)
-            setup.disgoProc = setup.procBuilder.start()
+                    .redirectErrorStream(true).start()
+            }
+            setup.disgoProc = setup.startProcess()
         }
 
         nodeSetup.each { nodeID, setup ->
