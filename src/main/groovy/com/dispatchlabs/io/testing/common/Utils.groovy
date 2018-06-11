@@ -2,22 +2,16 @@ package com.dispatchlabs.io.testing.common
 
 import com.jayway.restassured.RestAssured
 import com.jayway.restassured.builder.RequestSpecBuilder
-import com.jayway.restassured.builder.ResponseSpecBuilder
-import com.jayway.restassured.config.LogConfig
-import com.jayway.restassured.config.SSLConfig
 import com.jayway.restassured.filter.log.LogDetail
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.specification.RequestSpecification
 import org.bouncycastle.jcajce.provider.digest.Keccak
 
-import javax.xml.bind.DatatypeConverter;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
+import javax.xml.bind.DatatypeConverter
+import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.util.concurrent.locks.Lock
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkArgument
 
 public class Utils {
 
@@ -101,6 +95,19 @@ public class Utils {
         ByteBuffer byteBuffer = ByteBuffer.allocate(Long.BYTES);
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         byteBuffer.putLong(0, value);
+        return byteBuffer.array();
+    }
+
+    /**
+     *
+     * @param value
+     * @return
+     */
+    public static byte[] doubleToBytes(double value) {
+        byte[] bytes = new byte[8];
+        ByteBuffer byteBuffer = ByteBuffer.allocate(bytes.length);
+        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        byteBuffer.putDouble(0, value);
         return byteBuffer.array();
     }
 

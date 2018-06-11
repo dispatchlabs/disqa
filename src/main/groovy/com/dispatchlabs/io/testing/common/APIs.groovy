@@ -6,9 +6,11 @@ import com.jayway.restassured.response.Response
 import com.jayway.restassured.specification.RequestSpecification
 import org.bouncycastle.jcajce.provider.digest.Keccak
 import org.bouncycastle.util.encoders.Hex
-import static org.hamcrest.Matchers.*;
 
 import javax.xml.bind.DatatypeConverter
+
+import static org.hamcrest.Matchers.equalTo
+import static org.hamcrest.Matchers.hasItem
 
 class APIs {
 
@@ -30,17 +32,33 @@ class APIs {
 
         String to = params.To
         long value = params.Value
+        //BigInteger value = params.Value
+        //double value = params.Value
         long time
-        if(params.Time)
+        if(params.Time!=null)
             time = params.Time
         else
             time = System.currentTimeMillis()
+
+        String code = ""
+        String method = ""
+        long hertz
+        String fromName = ""
+        String toName = ""
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream( );
-        byteArrayOutputStream.write(0);
+        byteArrayOutputStream.write(0); //type
         byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(from));
         byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(to));
         byteArrayOutputStream.write(Utils.longToBytes(value));
+        //byteArrayOutputStream.write(value.toByteArray());
+        //byteArrayOutputStream.write(Utils.doubleToBytes(value));
         byteArrayOutputStream.write(Utils.longToBytes(time));
+        //byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(code));
+        //byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(method));
+        //byteArrayOutputStream.write(0); //hertz
+        //byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(fromName));
+        //byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(toName));
 
         Keccak.Digest256 digestSHA3 = new Keccak.Digest256();
         digestSHA3.update(byteArrayOutputStream.toByteArray());
@@ -48,10 +66,39 @@ class APIs {
         String hash = Hex.toHexString(hashBytes)
         String signatureStr = Utils.sign(privateKey,hash)
         request.contentType(ContentType.JSON)
+                //.body("{\"hash\":\"$hash\",\"type\":0,\"from\":\"$from\",\"to\":\"$to\",\"value\":$value,\"time\":$time,\"code\":\"$code\",\"method\":\"$method\",\"hertz\":0,\"fromName\":\"$fromName\",\"toName\":\"$toName\",\"signature\":\"$signatureStr\"}")
                 .body("{\"hash\":\"$hash\",\"type\":0,\"from\":\"$from\",\"to\":\"$to\",\"value\":$value,\"time\":$time,\"signature\":\"$signatureStr\"}")
                 .log().all()
         Response response = request.post("/v1/transactions")
         response.then().log().all()
+
+        //Verify response (optional)
+        if(params.Status)
+            response.then().assertThat().body("status",equalTo(params.Status))
+
+        return response
+    }
+
+    public static customAPICall(def params){
+        RequestSpecification request = RestAssured.given()
+        request.baseUri("http://"+params.IP+":"+params.HttpPort)
+
+        request.contentType(ContentType.JSON)
+                .body(params.Body)
+                .log().all()
+        Response response = request.post(params.API)
+        response.then().log().all()
+
+        //Verify response (optional)
+        if(params.Status) {
+            response.then().assertThat().body("status", equalTo(params.Status))
+        }
+
+        //Verify return code (optional)
+        if(params.StatusCode){
+            response.then().statusCode(params.StatusCode)
+        }
+
         return response
     }
 
@@ -106,7 +153,6 @@ class APIs {
         request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
         Response response = request.get("/v1/delegates")
         response.then().log().all()
-        println("test")
         params.Delegates.each{Name,Delegate->
             println(Delegate.address)
             response.then().assertThat().body("data.address",hasItem(Delegate.address))
