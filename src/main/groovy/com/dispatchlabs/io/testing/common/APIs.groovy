@@ -32,19 +32,33 @@ class APIs {
 
         String to = params.To
         long value = params.Value
+        //BigInteger value = params.Value
         //double value = params.Value
         long time
-        if(params.Time)
+        if(params.Time!=null)
             time = params.Time
         else
             time = System.currentTimeMillis()
+
+        String code = ""
+        String method = ""
+        long hertz
+        String fromName = ""
+        String toName = ""
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream( );
-        byteArrayOutputStream.write(0);
+        byteArrayOutputStream.write(0); //type
         byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(from));
         byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(to));
         byteArrayOutputStream.write(Utils.longToBytes(value));
+        //byteArrayOutputStream.write(value.toByteArray());
         //byteArrayOutputStream.write(Utils.doubleToBytes(value));
         byteArrayOutputStream.write(Utils.longToBytes(time));
+        //byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(code));
+        //byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(method));
+        //byteArrayOutputStream.write(0); //hertz
+        //byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(fromName));
+        //byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(toName));
 
         Keccak.Digest256 digestSHA3 = new Keccak.Digest256();
         digestSHA3.update(byteArrayOutputStream.toByteArray());
@@ -52,6 +66,7 @@ class APIs {
         String hash = Hex.toHexString(hashBytes)
         String signatureStr = Utils.sign(privateKey,hash)
         request.contentType(ContentType.JSON)
+                //.body("{\"hash\":\"$hash\",\"type\":0,\"from\":\"$from\",\"to\":\"$to\",\"value\":$value,\"time\":$time,\"code\":\"$code\",\"method\":\"$method\",\"hertz\":0,\"fromName\":\"$fromName\",\"toName\":\"$toName\",\"signature\":\"$signatureStr\"}")
                 .body("{\"hash\":\"$hash\",\"type\":0,\"from\":\"$from\",\"to\":\"$to\",\"value\":$value,\"time\":$time,\"signature\":\"$signatureStr\"}")
                 .log().all()
         Response response = request.post("/v1/transactions")
