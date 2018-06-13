@@ -74,7 +74,7 @@ class NodeSetup {
             setup.HttpPort = lastPort
             setup.GrpcPort = lastPort+1
             lastPort = lastPort+2
-            if(setup.IsDelegate == true) allDelegates << "127.0.0.1:$setup.GrpcPort"
+            if(setup.IsDelegate == true) allDelegates << [host:"127.0.0.1",port:setup.GrpcPort]
             if(setup.IsSeed == true) allSeeds << [host:"127.0.0.1",port:setup.GrpcPort]
         }
 
@@ -91,6 +91,7 @@ class NodeSetup {
                     "grpcTimeout": 5,
                     "useQuantumEntropy": false,
                     "seedEndpoints": allSeeds,
+                    "delegateEndpoints": allDelegates,
                     "genesisTransaction":genTransaction
             ]
             config = JsonOutput.toJson(config)
