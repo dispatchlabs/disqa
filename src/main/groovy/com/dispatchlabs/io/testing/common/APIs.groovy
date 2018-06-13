@@ -4,6 +4,7 @@ import com.jayway.restassured.RestAssured
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Response
 import com.jayway.restassured.specification.RequestSpecification
+import groovy.json.JsonOutput
 import org.bouncycastle.jcajce.provider.digest.Keccak
 import org.bouncycastle.util.encoders.Hex
 
@@ -42,14 +43,25 @@ class APIs {
 
         String code = ""
         String method = ""
+        String abi = ""
+        String paramsToContract = null
         long hertz
         String fromName = ""
         String toName = ""
+
+        if(params.Code) code = params.Code
+        if(params.Method) method = params.Method
+        if(params.ABI) abi = params.ABI
+        if(params.Params) paramsToContract = params.Params
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream( );
         byteArrayOutputStream.write(0); //type
         byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(from));
         byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(to));
+//        byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(code));
+//        byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(method));
+//        byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(abi));
+        //byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(paramsToContract));
         byteArrayOutputStream.write(Utils.longToBytes(value));
         //byteArrayOutputStream.write(value.toByteArray());
         //byteArrayOutputStream.write(Utils.doubleToBytes(value));
@@ -65,9 +77,22 @@ class APIs {
         byte[] hashBytes = digestSHA3.digest();
         String hash = Hex.toHexString(hashBytes)
         String signatureStr = Utils.sign(privateKey,hash)
+
+        def transaction = [
+                code:code,
+                hash:hash,
+                type:0,
+                from:from,
+                to:to,
+                value:value,
+                time:time,
+                signature:signatureStr,
+                params:paramsToContract,
+                abi:abi,
+                method:method
+        ]
         request.contentType(ContentType.JSON)
-                //.body("{\"hash\":\"$hash\",\"type\":0,\"from\":\"$from\",\"to\":\"$to\",\"value\":$value,\"time\":$time,\"code\":\"$code\",\"method\":\"$method\",\"hertz\":0,\"fromName\":\"$fromName\",\"toName\":\"$toName\",\"signature\":\"$signatureStr\"}")
-                .body("{\"hash\":\"$hash\",\"type\":0,\"from\":\"$from\",\"to\":\"$to\",\"value\":$value,\"time\":$time,\"signature\":\"$signatureStr\"}")
+                .body(JsonOutput.toJson(transaction))
                 .log().all()
         Response response = request.post("/v1/transactions")
         response.then().log().all()
