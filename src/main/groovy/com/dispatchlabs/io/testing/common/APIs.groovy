@@ -12,6 +12,7 @@ import javax.xml.bind.DatatypeConverter
 
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasItem
+import static org.hamcrest.Matchers.nullValue
 
 class APIs {
 
@@ -44,33 +45,30 @@ class APIs {
         String code = ""
         String method = ""
         String abi = ""
-        String paramsToContract = null
-        long hertz
+        ArrayList paramsToContract = null
+        int hertz = 0
         String fromName = ""
         String toName = ""
+        byte type = 0
+        if(params.Type) type = params.Type
 
         if(params.Code) code = params.Code
         if(params.Method) method = params.Method
         if(params.ABI) abi = params.ABI
         if(params.Params) paramsToContract = params.Params
+        if(params.Hertz) hertz = params.Hertz
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream( );
-        byteArrayOutputStream.write(0); //type
+        byteArrayOutputStream.write(type);
         byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(from));
         byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(to));
-//        byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(code));
-//        byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(method));
-//        byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(abi));
-        //byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(paramsToContract));
         byteArrayOutputStream.write(Utils.longToBytes(value));
-        //byteArrayOutputStream.write(value.toByteArray());
-        //byteArrayOutputStream.write(Utils.doubleToBytes(value));
+        byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(code));
+        byteArrayOutputStream.write(abi.getBytes("UTF-8"));
+        byteArrayOutputStream.write(method.getBytes("UTF-8"));
+        //byteArrayOutputStream.write(code.getBytes());
         byteArrayOutputStream.write(Utils.longToBytes(time));
-        //byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(code));
-        //byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(method));
-        //byteArrayOutputStream.write(0); //hertz
-        //byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(fromName));
-        //byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(toName));
+
 
         Keccak.Digest256 digestSHA3 = new Keccak.Digest256();
         digestSHA3.update(byteArrayOutputStream.toByteArray());
@@ -81,7 +79,7 @@ class APIs {
         def transaction = [
                 code:code,
                 hash:hash,
-                type:0,
+                type:type,
                 from:from,
                 to:to,
                 value:value,
@@ -89,7 +87,10 @@ class APIs {
                 signature:signatureStr,
                 params:paramsToContract,
                 abi:abi,
-                method:method
+                method:method,
+                hertz:hertz,
+                fromName:"",
+                toName:""
         ]
         request.contentType(ContentType.JSON)
                 .body(JsonOutput.toJson(transaction))
@@ -133,13 +134,12 @@ class APIs {
             timeout = params.Timeout
         else
             params.Timeout = timeout
-
         while (timeout>0){
             RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
             request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
             Response response = request.get("/v1/statuses/"+params.ID)
             response.then().log().all()
-            if(response.then().statusCode(200).extract().path("status") == params.Status) return
+            if(response.then().statusCode(200).extract().path("status") == params.Status) return response
             sleep(1000)
             timeout--
         }
@@ -170,6 +170,8 @@ class APIs {
                 response.then().assertThat().body("status",equalTo(params.Status))
             if(params.Balance)
                 response.then().assertThat().body("data.balance",equalTo(params.Balance))
+            if(params.ContractResult)
+                response.then().assertThat().body("contractResult",equalTo(params.ContractResult))
         }
     }
 

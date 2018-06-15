@@ -1,5 +1,6 @@
 package api.transactions
 
+import com.dispatchlabs.io.testing.common.Contracts
 import com.dispatchlabs.io.testing.common.NodeSetup
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
@@ -99,6 +100,25 @@ class RegressionTransactions {
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Status: "InvalidTransaction"
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 999
     }
+
+    @Test(description="Smart Contract Smoke",groups = ["smoke", "smart contract"])
+    public void transactionRegression6_SmartContract(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
+                Code:Contracts.defaultSample
+        response = waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        def contractAddress = response.then().extract().path("contractAddress")
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+                ABI: Contracts.defaultSampleABI,
+                Method: "setVar5",Params: ["5555"]
+        waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+                ABI: Contracts.defaultSampleABI,
+                Method: "getVar5",Params: []
+        def getID = response.then().extract().path("id")
+        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:"5555")
+    }
+
     /*
     @Test(description="Decimal point tokens",groups = ["smoke", "transactions"])
     public void transactionRegression6_DelegateDecimalTokens(){
