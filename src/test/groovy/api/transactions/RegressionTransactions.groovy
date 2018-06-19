@@ -6,6 +6,7 @@ import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 
 import static com.dispatchlabs.io.testing.common.APIs.*
+import static org.hamcrest.Matchers.equalTo
 
 class RegressionTransactions {
     def allNodes
@@ -117,6 +118,54 @@ class RegressionTransactions {
         def getID = response.then().extract().path("id")
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
         verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:"5555")
+    }
+
+    @Test(description="Pass invalid value for parameter type: string",groups = ["smart contract"])
+    public void transactionRegression7_SmartContract(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
+                Code:Contracts.defaultSample
+        response = waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        def contractAddress = response.then().extract().path("contractAddress")
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+                ABI: Contracts.defaultSampleABI,
+                Method: "setVar5",Params: "5555"
+        response.then().assertThat().body("type",equalTo("InvalidTransaction"))
+    }
+
+    @Test(description="Pass invalid value for parameter type: hash",groups = ["smart contract"])
+    public void transactionRegression8_SmartContract(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
+                Code:Contracts.defaultSample
+        response = waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        def contractAddress = response.then().extract().path("contractAddress")
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+                ABI: Contracts.defaultSampleABI,
+                Method: "setVar5",Params: ["value":"5555"]
+        response.then().assertThat().body("type",equalTo("InvalidTransaction"))
+    }
+
+    @Test(description="Pass invalid value for parameter type: integer",groups = ["smart contract"])
+    public void transactionRegression9_SmartContract(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
+                Code:Contracts.defaultSample
+        response = waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        def contractAddress = response.then().extract().path("contractAddress")
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+                ABI: Contracts.defaultSampleABI,
+                Method: "setVar5",Params: 5555
+        response.then().assertThat().body("type",equalTo("InvalidTransaction"))
+    }
+
+    @Test(description="Pass invalid value for parameter type: boolean",groups = ["smart contract"])
+    public void transactionRegression10_SmartContract(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
+                Code:Contracts.defaultSample
+        response = waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        def contractAddress = response.then().extract().path("contractAddress")
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+                ABI: Contracts.defaultSampleABI,
+                Method: "setVar5",Params: false
+        response.then().assertThat().body("type",equalTo("InvalidTransaction"))
     }
 
     /*

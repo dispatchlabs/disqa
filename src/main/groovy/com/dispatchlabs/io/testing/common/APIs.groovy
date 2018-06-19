@@ -42,21 +42,21 @@ class APIs {
         else
             time = System.currentTimeMillis()
 
-        String code = ""
-        String method = ""
-        String abi = ""
-        ArrayList paramsToContract = null
-        int hertz = 0
-        String fromName = ""
-        String toName = ""
+        def code = ""
+        def method = ""
+        def abi = ""
+        def paramsToContract = null
+        def hertz = 0
+        def fromName = ""
+        def toName = ""
         byte type = 0
         if(params.Type) type = params.Type
 
-        if(params.Code) code = params.Code
-        if(params.Method) method = params.Method
-        if(params.ABI) abi = params.ABI
-        if(params.Params) paramsToContract = params.Params
-        if(params.Hertz) hertz = params.Hertz
+        if(params.Code != "" && params.Code != null) code = params.Code
+        if(params.Method != "" && params.Method != null) method = params.Method
+        if(params.ABI != "" && params.ABI != null) abi = params.ABI
+        if(params.Params != null) paramsToContract = params.Params
+        if(params.Hertz != 0 && params.Hertz != null) hertz = params.Hertz
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream( );
         byteArrayOutputStream.write(type);
