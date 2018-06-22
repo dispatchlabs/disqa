@@ -67,10 +67,10 @@ class RegressionSmartContracts {
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
                 Method: "setVar5",Params: [false]
-        //response.then().assertThat().body("type",equalTo("InvalidTransaction"))
-        def getID = response.then().extract().path("id")
-        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:"5555")
+        response.then().assertThat().body("type",equalTo("InvalidTransaction"))
+        //def getID = response.then().extract().path("id")
+        //waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        //verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:"5555")
     }
 
     @Test(description="Pass invalid value for parameter type: hash",groups = ["smart contract"])
