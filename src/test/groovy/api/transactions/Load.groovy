@@ -3,11 +3,6 @@ package api.transactions
 import com.dispatchlabs.io.testing.common.NodeSetup
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.DataProvider
-import org.testng.annotations.Test
-
-import static com.dispatchlabs.io.testing.common.APIs.sendTransaction
-import static com.dispatchlabs.io.testing.common.APIs.verifyConsensusForAccount
-import static com.dispatchlabs.io.testing.common.APIs.waitForTransactionStatus
 
 class Load {
     def allNodes
@@ -26,7 +21,7 @@ class Load {
         return data as Object[][]
     }
 
-    @Test(dataProvider = "SlowLoad")
+    /*@Test(dataProvider = "SlowLoad")
     public void load1_slow(int amount,balance){
         def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:amount, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
@@ -34,5 +29,5 @@ class Load {
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok"
 
         sleep(100)
-    }
+    }*/
 }

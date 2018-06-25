@@ -1,6 +1,7 @@
 package api.transactions
 
 import com.dispatchlabs.io.testing.common.NodeSetup
+import com.dispatchlabs.io.testing.common.Utils
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 
@@ -16,8 +17,40 @@ class RegressionTransactions {
         allNodes = NodeSetup.quickSetup Delegate: 4,Seed: 1,Regular: 0
     }
 
+    @Test(description="Genesis to Delegate token transfer",groups = ["smoke", "transactions"])
+    public void transactions_API101(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+        waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 999
+    }
+
+    @Test(description="Genesis to New Account token transfer",groups = ["smoke", "transactions"])
+    public void transactions_API102(){
+        def newAccount = Utils.createAccount()
+
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
+                To:newAccount.address ,From: "Genesis"
+        waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:newAccount.address, Status: "Ok", Balance: 999
+    }
+
+    @Test(description="Delegate to delegate: 999 token transfer",groups = ["smoke", "transactions"])
+    public void transactions_API51(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:999, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+        waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 999
+
+        response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
+        waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate1, Status: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address, Status: "Ok", Balance: 15
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 984
+    }
+
     @Test(description="All delegate tokens transferred",groups = ["smoke", "transactions"])
-    public void transactionRegression1_AllDelegateTokens(){
+    public void transactions_API103(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:999, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
@@ -30,8 +63,8 @@ class RegressionTransactions {
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 0
     }
 
-    @Test(description="Transfer 0 tokens",groups = ["smoke", "transactions"])
-    public void transactionRegression2_0DelegateTokens(){
+    @Test(description="Transfer zero tokens",groups = ["smoke", "transactions"])
+    public void transactions_API96(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:999, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
@@ -48,8 +81,8 @@ class RegressionTransactions {
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 998
     }
 
-    @Test(description="Transfer more than available tokens",groups = ["smoke", "transactions"])
-    public void transactionRegression3_DelegateMoreThanAllTokens(){
+    @Test(description="Negative: Transfer more than available tokens in the wallet",groups = ["smoke", "transactions"])
+    public void transactions_API84(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:999, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
@@ -67,7 +100,7 @@ class RegressionTransactions {
     }
 
     @Test(description="Transfer tokens from one delegate to another and then back again",groups = ["smoke", "transactions"])
-    public void transactionRegression4_DelegateTokensBackandForth(){
+    public void transactions_API104(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:999, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
@@ -88,8 +121,8 @@ class RegressionTransactions {
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 1000
     }
 
-    @Test(description="Negative token transfer",groups = ["smoke", "transactions"])
-    public void transactionRegression5_DelegateNegativeTokens(){
+    @Test(description="Negative: Transfer negative amount of tokens to Delegate",groups = ["smoke", "transactions"])
+    public void transactions_API78(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:999, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
