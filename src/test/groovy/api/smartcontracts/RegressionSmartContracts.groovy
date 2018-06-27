@@ -133,7 +133,7 @@ class RegressionSmartContracts {
         def contractAddress = response.then().extract().path("contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
-                Method: "setVar5",Params: []
+                Method: "multiParams",Params: ["sdfsdf"]
         response = waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
         response.then().assertThat().body("type",equalTo("InvalidTransaction"))
     }
@@ -199,6 +199,8 @@ class RegressionSmartContracts {
     public void SmartContract_API36(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample.substring(0,DefaultSampleContract.defaultSample.size()-10)
+        def getID = response.then().extract().path("id")
+        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
         response.then().assertThat().body("type",equalTo("InvalidTransaction"))
     }
 
@@ -239,6 +241,20 @@ class RegressionSmartContracts {
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress1, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "notThere",Params: []
+        def getID = response.then().extract().path("id")
+        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:"")
+    }
+
+    @Test(description="Negative: Pass more parameters for a method than it has",groups = ["smart contract"])
+    public void SmartContract_API109(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
+                Code:ComplexContract.contract
+        response = waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        def contractAddress1 = response.then().extract().path("contractAddress")
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress1, PrivateKey:"Genesis",Type:2,
+                ABI: ComplexContract.abi,
+                Method: "setVar5",Params: ["asfsf","asfsfsdfsdf"]
         def getID = response.then().extract().path("id")
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
         verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:"")
