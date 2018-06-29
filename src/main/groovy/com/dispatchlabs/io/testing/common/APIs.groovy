@@ -172,6 +172,8 @@ class APIs {
                 response.then().assertThat().body("data.balance",equalTo(params.Balance))
             if(params.ContractResult)
                 response.then().assertThat().body("contractResult",equalTo(params.ContractResult))
+            if(params.HumanReadable)
+                response.then().assertThat().body("humanReadableStatus",equalTo(params.HumanReadable))
         }
     }
 

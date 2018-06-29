@@ -85,7 +85,7 @@ class RegressionSmartContracts {
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
                 Method: "setVar5",Params: ["value":"5555"]
-        response.then().assertThat().body("type",equalTo("InvalidTransaction"))
+        response.then().statusCode(500).assertThat().body("status",equalTo("JSON_PARSE_ERROR: value for field 'params' must be an array"))
     }
 
     @Test(description="Pass invalid value for parameter type: integer",groups = ["smart contract"])
@@ -97,7 +97,7 @@ class RegressionSmartContracts {
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
                 Method: "setVar5",Params: 5555
-        response.then().assertThat().body("type",equalTo("InvalidTransaction"))
+        response.then().statusCode(500).assertThat().body("status",equalTo("JSON_PARSE_ERROR: value for field 'params' must be an array"))
     }
 
     @Test(description="Pass invalid value for parameter type: boolean",groups = ["smart contract"])
@@ -134,8 +134,9 @@ class RegressionSmartContracts {
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
                 Method: "multiParams",Params: ["sdfsdf"]
-        response = waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-        response.then().assertThat().body("type",equalTo("InvalidTransaction"))
+        def getID = response.then().extract().path("id")
+        waitForTransactionStatus ID:getID,Node:allNodes.Delegates.Delegate0, Status: "InternalError", Timeout: 10
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,Status: "InternalError",HumanReadable: "method 'multiParams' not found")
     }
 
     @Test(description="Deploy exact same contract",groups = ["smart contract"])
@@ -182,10 +183,11 @@ class RegressionSmartContracts {
         response = waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
         def contractAddress = response.then().extract().path("contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
-                ABI: "adfsdfsdfsfsdffffffffffffffffffffffffff",
+                ABI: "aaaaadddddsdfsdfsfsdffffffffffffffffffffffffff",
                 Method: "setVar5",Params: ["10"]
-        waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-        response.then().assertThat().body("type",equalTo("InvalidTransaction"))
+        def getID = response.then().extract().path("id")
+        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "InternalError", Timeout: 10
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,Status: "InternalError",HumanReadable: '''invalid character 'ª' looking for beginning of value''')
     }
 
     @Test(description="Negative: Empty smart contract",groups = ["smart contract"])
@@ -200,8 +202,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample.substring(0,DefaultSampleContract.defaultSample.size()-10)
         def getID = response.then().extract().path("id")
-        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-        response.then().assertThat().body("type",equalTo("InvalidTransaction"))
+        response = waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "InvalidTransaction", Timeout: 10
     }
 
     @Test(description="Contract returns multiple values (2 strings)",groups = ["smart contract"])
@@ -242,8 +243,8 @@ class RegressionSmartContracts {
                 ABI: ComplexContract.abi,
                 Method: "notThere",Params: []
         def getID = response.then().extract().path("id")
-        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:"")
+        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "InternalError", Timeout: 10
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,Status:"InternalError",HumanReadable:"method 'notThere' not found")
     }
 
     @Test(description="Negative: Pass more parameters for a method than it has",groups = ["smart contract"])
@@ -256,7 +257,7 @@ class RegressionSmartContracts {
                 ABI: ComplexContract.abi,
                 Method: "setVar5",Params: ["asfsf","asfsfsdfsdf"]
         def getID = response.then().extract().path("id")
-        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:"")
+        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "InternalError", Timeout: 10
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,Status: "InternalError",HumanReadable: "argument count mismatch: 2 for 1")
     }
 }
