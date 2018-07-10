@@ -28,6 +28,6 @@ class Load {
         waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok"
 
-        sleep(100)
+        //sleep(100)
     }*/
 }

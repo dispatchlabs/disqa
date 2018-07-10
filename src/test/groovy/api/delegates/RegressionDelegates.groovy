@@ -20,4 +20,9 @@ class RegressionDelegates {
     public void delegates_API75(){
         verifyDelegates Node:allNodes.Delegates.Delegate0, Delegates:allNodes.Delegates
     }
+
+    /*@Test(description="Get the initial delegates that were spawned by base state",groups = ["smoke", "delegates"])
+    public void delegates_API112(){
+        verifyDelegates Node:allNodes.Seeds.Seed0, Delegates:allNodes.Delegates
+    }*/
 }
