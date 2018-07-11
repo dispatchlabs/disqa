@@ -6,10 +6,8 @@ import com.dispatchlabs.io.testing.common.contracts.DefaultSampleContract
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 
-import javax.xml.bind.DatatypeConverter
-
 import static com.dispatchlabs.io.testing.common.APIs.*
-import static org.hamcrest.Matchers.*
+import static org.hamcrest.Matchers.equalTo
 
 class RegressionSmartContracts {
     def allNodes
@@ -289,7 +287,7 @@ class RegressionSmartContracts {
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: "",
                 Method: "setVar5",Params: ["10"]
-        response.then().assertThat().body("type",equalTo("InvalidTransaction"))
+        response.then().statusCode(500).assertThat().body("status",equalTo("JSON_PARSE_ERROR: value for field 'abi' is invalid"))
     }
 
     @Test(description="Negative: Invalid values for ABI",groups = ["smart contract"])

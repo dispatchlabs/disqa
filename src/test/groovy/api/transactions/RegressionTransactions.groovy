@@ -163,7 +163,7 @@ class RegressionTransactions {
         waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
 
         response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:1, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
-                To:"" ,From: allNodes.Delegates.Delegate0.address//, Status: "InvalidTransaction"
+                To:"" ,From: allNodes.Delegates.Delegate0.address, Status: "InvalidTransaction"
         waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "InvalidTransaction", Timeout: 10
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 999
     }
