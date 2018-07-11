@@ -7,7 +7,7 @@ import org.testng.annotations.DataProvider
 class Load {
     def allNodes
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void baseState(){
         allNodes = NodeSetup.quickSetup Delegate: 4,Seed: 1,Regular: 0
     }

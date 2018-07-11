@@ -15,7 +15,7 @@ class RegressionSmartContracts {
     def allNodes
     def delegates
 
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void baseState(){
         //create and start all needed nodes for each test
         allNodes = NodeSetup.quickSetup Delegate: 4,Seed: 1,Regular: 0
