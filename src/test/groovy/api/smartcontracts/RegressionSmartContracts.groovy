@@ -38,7 +38,7 @@ class RegressionSmartContracts {
                 Method: "getVar5",Params: []
         def getID = response.then().extract().path("id")
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:"aaaaaaaaaaaaa")
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["aaaaaaaaaaaaa"])
     }
 
     @Test(description="Contract return types: integer",groups = ["smart contract"])
@@ -52,7 +52,7 @@ class RegressionSmartContracts {
                 Method: "returnInt",Params: []
         def getID = response.then().extract().path("id")
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:20)
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:[20])
     }
 
     @Test(description="Contract return types: uint",groups = ["smart contract"])
@@ -66,7 +66,7 @@ class RegressionSmartContracts {
                 Method: "returnUint",Params: []
         def getID = response.then().extract().path("id")
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:20)
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:[20])
     }
 
     @Test(description="Contract return types: address",groups = ["smart contract"])
@@ -81,7 +81,7 @@ class RegressionSmartContracts {
         def getID = response.then().extract().path("id")
         response = waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
         def returnedAddress = response.then().extract().path("contractResult")
-        assert returnedAddress.size() == 20,"Error: address size should be 20."
+        assert returnedAddress[0].size() == 20,"Error: address size should be 20."
     }
 
     @Test(description="Contract return types: boolean",groups = ["smart contract"])
@@ -95,7 +95,7 @@ class RegressionSmartContracts {
                 Method: "returnBool",Params: []
         def getID = response.then().extract().path("id")
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:false)
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:[false])
     }
 
 
@@ -110,7 +110,7 @@ class RegressionSmartContracts {
                 Method: "intParam",Params: [20]
         def getID = response.then().extract().path("id")
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:"test")
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["test"])
     }
 
     @Test(description="Contract pass method parameter types: uint",groups = ["smart contract"])
@@ -124,7 +124,7 @@ class RegressionSmartContracts {
                 Method: "uintParam",Params: [20]
         def getID = response.then().extract().path("id")
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:"test")
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["test"])
     }
 
 
@@ -139,7 +139,7 @@ class RegressionSmartContracts {
                 Method: "boolParamType",Params: [true]
         def getID = response.then().extract().path("id")
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:"test")
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["test"])
     }
 
     @Test(description="Contract pass method parameter types: array",groups = ["smart contract"])
@@ -153,7 +153,7 @@ class RegressionSmartContracts {
                 Method: "arrayParam",Params: [[1,2]]
         def getID = response.then().extract().path("id")
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:1)
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:[1])
     }
 
 
@@ -172,7 +172,7 @@ class RegressionSmartContracts {
                 Method: "getVar5",Params: []
         def getID = response.then().extract().path("id")
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:"5555")
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["5555"])
     }
 
     @Test(description="Negative: Pass invalid value for parameter type: string",groups = ["smart contract"])
@@ -275,7 +275,7 @@ class RegressionSmartContracts {
                 Method: "getVar5"
         def getID = response.then().extract().path("id")
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:"aaaaaaaaaaaaa")
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["aaaaaaaaaaaaa"])
     }
 
     @Test(description="Negative: Empty ABI on contract method call",groups = ["smart contract"])
