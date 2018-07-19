@@ -250,7 +250,7 @@ class RegressionSmartContracts {
                 Method: "multiParams",Params: ["sdfsdf"]
         def getID = response.then().extract().path("id")
         waitForTransactionStatus ID:getID,Node:allNodes.Delegates.Delegate0, Status: "InternalError", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,Status: "InternalError",HumanReadable: "method 'multiParams' not found")
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,Status: "InternalError",humanReadableStatus: "argument count mismatch: 1 for 2")
     }
 
     @Test(description="Deploy exact same contract",groups = ["smart contract"])
