@@ -75,7 +75,7 @@ class NodeSetup {
             setup.GrpcPort = lastPort+1
             lastPort = lastPort+2
             //if(setup.IsDelegate == true) allDelegates << [host:"127.0.0.1",port:setup.GrpcPort]
-            if(setup.IsSeed == true) allSeeds << [Endpoint:[host:"127.0.0.1",port:setup.GrpcPort],Type:"Seed"]
+            if(setup.IsSeed == true) allSeeds << [host:"127.0.0.1",port:setup.GrpcPort]
         }
 
         def createNodeConfig = {nodeID,setup->
