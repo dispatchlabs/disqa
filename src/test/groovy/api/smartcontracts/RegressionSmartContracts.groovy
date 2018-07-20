@@ -307,14 +307,15 @@ class RegressionSmartContracts {
     @Test(description="Negative: Empty smart contract",groups = ["smart contract"])
     public void SmartContract_API35(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
-                Code:""
+                Code:"",ABI: DefaultSampleContract.defaultSampleABI
         waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
     }
 
     @Test(description="Negative: Partial bytecode of valid contract",groups = ["smart contract"])
     public void SmartContract_API36(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
-                Code:DefaultSampleContract.defaultSample.substring(0,DefaultSampleContract.defaultSample.size()-10)
+                ABI: DefaultSampleContract.defaultSampleABI,
+                Code:"60806040523480156100105760"//DefaultSampleContract.defaultSample.substring(0,DefaultSampleContract.defaultSample.size()-10)
         def getID = response.then().extract().path("id")
         response = waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "InvalidTransaction", Timeout: 10
     }

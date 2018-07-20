@@ -6,6 +6,7 @@ import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 
 import static com.dispatchlabs.io.testing.common.APIs.*
+import static org.hamcrest.Matchers.equalTo
 
 class RegressionTransactions {
     def allNodes
@@ -163,8 +164,8 @@ class RegressionTransactions {
         waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
 
         response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:1, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
-                To:"" ,From: allNodes.Delegates.Delegate0.address, Status: "InvalidTransaction"
-        waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "InvalidTransaction", Timeout: 10
+                To:"" ,From: allNodes.Delegates.Delegate0.address
+        response.then().statusCode(500).assertThat().body("status",equalTo("JSON_PARSE_ERROR: value for field 'to' is invalid"))
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 999
     }
 
@@ -179,7 +180,7 @@ class RegressionTransactions {
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 999
     }
 
-    @Test(description="Time value 1 year in the past",groups = ["transactions"])
+    @Test(description="Negative: Time value 1 year in the past",groups = ["transactions"])
     public void transactions_API68(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:999, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
@@ -187,13 +188,13 @@ class RegressionTransactions {
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 999
 
         response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
-                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,Time: 1500108301994
+                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,Time: -1500108301994,Status: "JSON_PARSE_ERROR: transaction time cannot be negative"
         //waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate1, Status: "Ok", Timeout: 10
         //verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address, Status: "Ok", Balance: 15
-        //verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 984
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 999
     }
 
-    @Test(description="Time value 1 year in the future",groups = ["transactions"])
+    @Test(description="Negative: Time value 1 year in the future",groups = ["transactions"])
     public void transactions_API67(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:999, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
@@ -201,7 +202,21 @@ class RegressionTransactions {
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 999
 
         response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
-                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,Time: 1576108301994, Status: "JSON_PARSE_ERROR: transaction time cannot be in the future"
+                //To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,Time: 1576108301994, Status: "JSON_PARSE_ERROR: transaction time cannot be in the future"
+                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,Time: System.currentTimeMillis()+30000000000, Status: "JSON_PARSE_ERROR: transaction time cannot be in the future"
+        waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate1, Status: "NotFound", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 999
+    }
+
+    @Test(description="Negative: Time value 200 ms in the future",groups = ["transactions"])
+    public void transactions_API115(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:999, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+        waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 999
+
+        response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,Time: System.currentTimeMillis()+200, Status: "JSON_PARSE_ERROR: transaction time cannot be in the future"
         waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate1, Status: "NotFound", Timeout: 10
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 999
     }

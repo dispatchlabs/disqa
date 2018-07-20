@@ -24,13 +24,6 @@ class NodeSetup {
 
         def allNodes = [:]
         def returnNodes = [:]
-        if(params.Seed){
-            returnNodes.Seeds = [:]
-            params.Seed.times{
-                returnNodes.Seeds["Seed$it"] = [IsDelegate:false,IsSeed:true]
-                allNodes["Seed$it"] = returnNodes.Seeds["Seed$it"]
-            }
-        }
         if(params.Delegate){
             returnNodes.Delegates = [:]
             params.Delegate.times{
@@ -43,6 +36,13 @@ class NodeSetup {
             params.Regular.times {
                 returnNodes.Regulars["Regular$it"] = [IsDelegate: false, IsSeed: false]
                 allNodes["Regular$it"] = returnNodes.Regulars["Regular$it"]
+            }
+        }
+        if(params.Seed){
+            returnNodes.Seeds = [:]
+            params.Seed.times{
+                returnNodes.Seeds["Seed$it"] = [IsDelegate:false,IsSeed:true]
+                allNodes["Seed$it"] = returnNodes.Seeds["Seed$it"]
             }
         }
         setupNodes(allNodes,directory,exeLocation)
@@ -74,11 +74,11 @@ class NodeSetup {
             setup.HttpPort = lastPort
             setup.GrpcPort = lastPort+1
             lastPort = lastPort+2
-            if(setup.IsDelegate == true) allDelegates << [host:"127.0.0.1",port:setup.GrpcPort]
-            if(setup.IsSeed == true) allSeeds << [host:"127.0.0.1",port:setup.GrpcPort]
+            //if(setup.IsDelegate == true) allDelegates << [host:"127.0.0.1",port:setup.GrpcPort]
+            if(setup.IsSeed == true) allSeeds << [Endpoint:[host:"127.0.0.1",port:setup.GrpcPort],Type:"Seed"]
         }
 
-        nodeSetup.each{nodeID,setup->
+        def createNodeConfig = {nodeID,setup->
             def config = [
                     httpEndpoint:[
                             host:setup.IP,
@@ -90,10 +90,16 @@ class NodeSetup {
                     ],
                     "grpcTimeout": 5,
                     "useQuantumEntropy": false,
-                    "seedEndpoints": allSeeds,
-                    "delegateEndpoints": allDelegates,
+                    //"seedEndpoints": allSeeds,
+                    //"delegateEndpoints": allDelegates,
                     "genesisTransaction":genTransaction
             ]
+            if(setup.IsDelegate){
+                config."seedEndpoints" = allSeeds as Serializable
+            }
+            if(setup.IsSeed){
+                config."delegateEndpoints" = allDelegates as Serializable
+            }
             config = JsonOutput.toJson(config)
             def basePath = directory.getAbsolutePath()+"/"+nodeID
             new File(basePath).mkdir()
@@ -111,8 +117,11 @@ class NodeSetup {
             }
             setup.disgoProc = setup.startProcess()
         }
+        nodeSetup.each{nodeID,setup->
+            if(setup.IsDelegate) createNodeConfig(nodeID,setup)
+        }
 
-        nodeSetup.each { nodeID, setup ->
+        def getAddress = { nodeID, setup ->
             def basePath = directory.getAbsolutePath()+"/"+nodeID
             //wait for wallet ID
             int timeout = 20
@@ -127,7 +136,21 @@ class NodeSetup {
                 }
                 timeout--
             }
-            assert false,"Error unable to get wallet ID from: ${nodeID} in 10 seconds"
+            assert false,"Error unable to get address from: ${nodeID} in 10 seconds"
+        }
+
+        nodeSetup.each { nodeID, setup ->
+            if(setup.IsDelegate) {
+                getAddress(nodeID,setup)
+                allDelegates << [Endpoint:[host:"127.0.0.1",port:setup.GrpcPort],Type:"Delegate",Address:setup.address]
+            }
+        }
+
+        nodeSetup.each{nodeID,setup->
+            if(setup.IsSeed) {
+                createNodeConfig(nodeID,setup)
+                getAddress(nodeID,setup)
+            }
         }
     }
 }
