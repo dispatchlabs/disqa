@@ -94,9 +94,7 @@ class NodeSetup {
                 //"delegateEndpoints": allDelegates,
                 "genesisTransaction":genTransaction
         ]
-            if(setup.IsDelegate){
-                config."seedEndpoints" = allSeeds as Serializable
-            }
+            config."seedEndpoints" = allSeeds as Serializable
             if(setup.IsSeed){
                 config."delegateEndpoints" = allDelegates as Serializable
             }
