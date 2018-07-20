@@ -90,13 +90,12 @@ class NodeSetup {
                 ],
                 "grpcTimeout": 5,
                 "useQuantumEntropy": false,
-                //"seedEndpoints": allSeeds,
-                //"delegateEndpoints": allDelegates,
+                "seedEndpoints": allSeeds,
+                delegates:[],
                 "genesisTransaction":genTransaction
         ]
-            config."seedEndpoints" = allSeeds as Serializable
             if(setup.IsSeed){
-                config."delegateEndpoints" = allDelegates as Serializable
+                config."delegates" = allDelegates
             }
             config = JsonOutput.toJson(config)
             def basePath = directory.getAbsolutePath()+"/"+nodeID
@@ -140,7 +139,7 @@ class NodeSetup {
         nodeSetup.each { nodeID, setup ->
             if(setup.IsDelegate) {
                 getAddress(nodeID,setup)
-                allDelegates << [Endpoint:[host:"127.0.0.1",port:setup.GrpcPort],Type:"Delegate",Address:setup.address]
+                allDelegates << [endpoint:[host:"127.0.0.1",port:setup.GrpcPort],Type:"Delegate",address:setup.address]
             }
         }
 
