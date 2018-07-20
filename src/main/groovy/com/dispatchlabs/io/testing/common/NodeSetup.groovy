@@ -80,23 +80,21 @@ class NodeSetup {
 
         def createNodeConfig = {nodeID,setup->
             def config = [
-                    httpEndpoint:[
-                            host:setup.IP,
-                            port:setup.HttpPort
-                    ],
-                    grpcEndpoint:[
-                            host:setup.IP,
-                            port:setup.GrpcPort
-                    ],
-                    "grpcTimeout": 5,
-                    "useQuantumEntropy": false,
-                    //"seedEndpoints": allSeeds,
-                    //"delegateEndpoints": allDelegates,
-                    "genesisTransaction":genTransaction
-            ]
-            if(setup.IsDelegate){
-                config."seedEndpoints" = allSeeds as Serializable
-            }
+                httpEndpoint:[
+                        host:setup.IP,
+                        port:setup.HttpPort
+                ],
+                grpcEndpoint:[
+                        host:setup.IP,
+                        port:setup.GrpcPort
+                ],
+                "grpcTimeout": 5,
+                "useQuantumEntropy": false,
+                //"seedEndpoints": allSeeds,
+                //"delegateEndpoints": allDelegates,
+                "genesisTransaction":genTransaction
+        ]
+            config."seedEndpoints" = allSeeds as Serializable
             if(setup.IsSeed){
                 config."delegateEndpoints" = allDelegates as Serializable
             }
