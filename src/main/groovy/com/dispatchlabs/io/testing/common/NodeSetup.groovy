@@ -139,7 +139,7 @@ class NodeSetup {
         nodeSetup.each { nodeID, setup ->
             if(setup.IsDelegate) {
                 getAddress(nodeID,setup)
-                allDelegates << [endpoint:[host:"127.0.0.1",port:setup.GrpcPort],Type:"Delegate",address:setup.address]
+                allDelegates << [endpoint:[host:"127.0.0.1",port:setup.GrpcPort],type:"Delegate",address:setup.address]
             }
         }
 
