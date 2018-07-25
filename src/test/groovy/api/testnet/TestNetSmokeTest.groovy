@@ -10,12 +10,12 @@ class TestNetSmokeTest {
                     Delegates:[
                         "Delegate0": [
                             "IP": "35.199.177.99",
-                            "HttpPort": 1973,
+                            "HttpPort": 1975,
                             "GrpcPort": 3501
                         ],
                         "Delegate1": [
                                 "IP": "35.197.127.151",
-                                "HttpPort": 1973,
+                                "HttpPort": 1975,
                                 "GrpcPort": 3501
                         ]
                     ]
