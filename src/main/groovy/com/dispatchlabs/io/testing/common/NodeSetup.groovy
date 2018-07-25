@@ -24,6 +24,13 @@ class NodeSetup {
 
         def allNodes = [:]
         def returnNodes = [:]
+        if(params.Seed){
+            returnNodes.Seeds = [:]
+            params.Seed.times{
+                returnNodes.Seeds["Seed$it"] = [IsDelegate:false,IsSeed:true]
+                allNodes["Seed$it"] = returnNodes.Seeds["Seed$it"]
+            }
+        }
         if(params.Delegate){
             returnNodes.Delegates = [:]
             params.Delegate.times{
@@ -36,13 +43,6 @@ class NodeSetup {
             params.Regular.times {
                 returnNodes.Regulars["Regular$it"] = [IsDelegate: false, IsSeed: false]
                 allNodes["Regular$it"] = returnNodes.Regulars["Regular$it"]
-            }
-        }
-        if(params.Seed){
-            returnNodes.Seeds = [:]
-            params.Seed.times{
-                returnNodes.Seeds["Seed$it"] = [IsDelegate:false,IsSeed:true]
-                allNodes["Seed$it"] = returnNodes.Seeds["Seed$it"]
             }
         }
         setupNodes(allNodes,directory,exeLocation)
@@ -91,12 +91,12 @@ class NodeSetup {
                 "grpcTimeout": 5,
                 "useQuantumEntropy": false,
                 "seedEndpoints": allSeeds,
-                delegates:[],
+                //delegates:[],
                 "genesisTransaction":genTransaction
         ]
-            if(setup.IsSeed){
-                config."delegates" = allDelegates
-            }
+//            if(setup.IsSeed){
+//                config."delegates" = allDelegates
+//            }
             config = JsonOutput.toJson(config)
             def basePath = directory.getAbsolutePath()+"/"+nodeID
             new File(basePath).mkdir()
@@ -115,7 +115,8 @@ class NodeSetup {
             setup.disgoProc = setup.startProcess()
         }
         nodeSetup.each{nodeID,setup->
-            if(setup.IsDelegate) createNodeConfig(nodeID,setup)
+            createNodeConfig(nodeID,setup)
+            //if(setup.IsDelegate) createNodeConfig(nodeID,setup)
         }
 
         def getAddress = { nodeID, setup ->
@@ -137,17 +138,18 @@ class NodeSetup {
         }
 
         nodeSetup.each { nodeID, setup ->
-            if(setup.IsDelegate) {
-                getAddress(nodeID,setup)
-                allDelegates << [endpoint:[host:"127.0.0.1",port:setup.GrpcPort],type:"Delegate",address:setup.address]
-            }
+            getAddress(nodeID,setup)
+//            if(setup.IsDelegate) {
+//                getAddress(nodeID,setup)
+//                allDelegates << [endpoint:[host:"127.0.0.1",port:setup.GrpcPort],type:"Delegate",address:setup.address]
+//            }
         }
-
-        nodeSetup.each{nodeID,setup->
-            if(setup.IsSeed) {
-                createNodeConfig(nodeID,setup)
-                getAddress(nodeID,setup)
-            }
-        }
+//
+//        nodeSetup.each{nodeID,setup->
+//            if(setup.IsSeed) {
+//                createNodeConfig(nodeID,setup)
+//                getAddress(nodeID,setup)
+//            }
+//        }
     }
 }
