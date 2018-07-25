@@ -129,6 +129,7 @@ class APIs {
     }
 
     public static waitForTransactionStatus(def params){
+        def status
         int timeout = 20
         if(params.Timeout)
             timeout = params.Timeout
@@ -139,15 +140,18 @@ class APIs {
             request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
             Response response = request.get("/v1/receipts/"+params.ID)
             response.then().log().all()
-            if(params.Status == "InsufficientTokens"){
-                if(response.then().statusCode(200).extract().path("data.status") == params.Status) return response
+            if(params.DataStatus){
+                status = params.DataStatus
+                if(response.then().statusCode(200).extract().path("data.status") == params.DataStatus) return response
             }
-            else if(response.then().statusCode(200).extract().path("status") == params.Status) return response
+            else{
+                status = params.Status
+                if(response.then().statusCode(200).extract().path("status") == params.Status) return response
+            }
             sleep(1000)
             timeout--
         }
-
-        assert false, "Error: status ${params.Status} for transaction ${params.ID} was not found in ${params.Timeout} seconds."
+        assert false, "Error: status ${status} for transaction ${params.ID} was not found in ${params.Timeout} seconds."
     }
 
     public static verifyConsensusForAccount(def params){
@@ -170,14 +174,16 @@ class APIs {
             request.baseUri("http://"+Node.IP+":"+Node.HttpPort)
             Response response = request.get("/v1/receipts/"+params.ID)
             response.then().log().all()
-            if(params.Status)
+            if(params.Status == "InternalError")
+                response.then().assertThat().body("data.status",equalTo(params.Status))
+            else if(params.Status)
                 response.then().assertThat().body("status",equalTo(params.Status))
             if(params.Balance)
                 response.then().assertThat().body("data.balance",equalTo(params.Balance))
             if(params.ContractResult)
-                response.then().assertThat().body("contractResult",equalTo(params.ContractResult))
+                response.then().assertThat().body("data.contractResult",equalTo(params.ContractResult))
             if(params.HumanReadable)
-                response.then().assertThat().body("humanReadableStatus",equalTo(params.HumanReadable))
+                response.then().assertThat().body("data.humanReadableStatus",equalTo(params.HumanReadable))
         }
     }
 
