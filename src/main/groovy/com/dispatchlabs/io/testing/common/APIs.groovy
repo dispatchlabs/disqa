@@ -102,7 +102,7 @@ class APIs {
         if(params.Status)
             response.then().assertThat().body("status",equalTo(params.Status))
 
-        return response
+        return [Hash:hash,Response:response]
     }
 
     public static customAPICall(def params){
@@ -137,9 +137,12 @@ class APIs {
         while (timeout>0){
             RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
             request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
-            Response response = request.get("/v1/statuses/"+params.ID)
+            Response response = request.get("/v1/receipts/"+params.ID)
             response.then().log().all()
-            if(response.then().statusCode(200).extract().path("status") == params.Status) return response
+            if(params.Status == "InsufficientTokens"){
+                if(response.then().statusCode(200).extract().path("data.status") == params.Status) return response
+            }
+            else if(response.then().statusCode(200).extract().path("status") == params.Status) return response
             sleep(1000)
             timeout--
         }
@@ -148,6 +151,7 @@ class APIs {
     }
 
     public static verifyConsensusForAccount(def params){
+        return
         params.Nodes.each{Name,Node->
             RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
             request.baseUri("http://"+Node.IP+":"+Node.HttpPort)
@@ -164,7 +168,7 @@ class APIs {
         params.Nodes.each{Node->
             RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
             request.baseUri("http://"+Node.IP+":"+Node.HttpPort)
-            Response response = request.get("/v1/statuses/"+params.ID)
+            Response response = request.get("/v1/receipts/"+params.ID)
             response.then().log().all()
             if(params.Status)
                 response.then().assertThat().body("status",equalTo(params.Status))
