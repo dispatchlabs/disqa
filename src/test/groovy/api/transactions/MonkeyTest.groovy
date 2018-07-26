@@ -124,7 +124,7 @@ public class Wallet extends Thread  {
                     def response = sendTransaction Node:node, Value:1, PrivateKey:node.privateKey,
                             To:toNode.address ,From: node.address
                     def transID = response.Hash
-                    waitForTransactionStatus ID: transID,Node:node, Status: "Ok", Timeout: 40
+                    waitForTransactionStatus ID: transID,Node:node, DataStatus: "Ok", Timeout: 40
                     ledger.add([NodeID:node.nodeID,Amount:-1,TransID:transID])
                     ledger.add([NodeID:toNode.nodeID,Amount:1,TransID:transID])
                 } catch (InterruptedException e) {
