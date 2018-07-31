@@ -6,7 +6,6 @@ import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 
 import static com.dispatchlabs.io.testing.common.APIs.*
-import static org.hamcrest.Matchers.equalTo
 
 class RegressionTransactions {
     def allNodes
@@ -95,7 +94,7 @@ class RegressionTransactions {
 
         response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:1000, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
-        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2, Status: "InsufficientTokens", Timeout: 10
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2, DataStatus: "InsufficientTokens", Timeout: 10
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address, Status: "Ok", Balance: 1
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 999
     }
@@ -146,14 +145,14 @@ class RegressionTransactions {
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2, Status: "Ok", Timeout: 10
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address, Status: "Ok", Balance: 15
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 984
-
+/*
         println("Sending same transaction again.")
-        sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
-                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Time:1530124068969, Status: "DuplicateTransaction"
+        response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Time:1530124068969//, Status: "DuplicateTransaction"
         sleep(2000)
-        //waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate1, Timeout: 10
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1, Timeout: 10
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address, Status: "Ok", Balance: 15
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 984
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: 984*/
 
     }
 

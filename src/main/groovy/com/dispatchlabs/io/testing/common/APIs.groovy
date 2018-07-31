@@ -12,7 +12,6 @@ import javax.xml.bind.DatatypeConverter
 
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasItem
-import static org.hamcrest.Matchers.nullValue
 
 class APIs {
 
@@ -155,7 +154,8 @@ class APIs {
     }
 
     public static verifyConsensusForAccount(def params){
-        return
+        //return
+        sleep(10000)
         params.Nodes.each{Name,Node->
             RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
             request.baseUri("http://"+Node.IP+":"+Node.HttpPort)
@@ -199,6 +199,7 @@ class APIs {
     }
 
     public static verifyTransactionsByFrom(def params){
+        sleep(10000)
         RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
         request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
         Response response = request.get("/v1/transactions/from/"+params.Address)
@@ -207,6 +208,7 @@ class APIs {
     }
 
     public static verifyTransactionsByTo(def params){
+        sleep(10000)
         RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
         request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
         Response response = request.get("/v1/transactions/to/"+params.Address)
