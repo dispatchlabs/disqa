@@ -169,6 +169,7 @@ class APIs {
     }
 
     public static verifyStatusForTransaction(def params){
+        sleep(10000)
         params.Nodes.each{Node->
             RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
             request.baseUri("http://"+Node.IP+":"+Node.HttpPort)
