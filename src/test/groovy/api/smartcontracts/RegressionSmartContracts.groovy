@@ -184,7 +184,7 @@ class RegressionSmartContracts {
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
                 Method: "setVar5",Params: [false]
-        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
         response.then().assertThat().body("type",equalTo("InvalidTransaction"))
         //def getID = response.Hash
         //verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:"5555")
