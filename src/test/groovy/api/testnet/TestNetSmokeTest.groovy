@@ -1,5 +1,6 @@
 package api.testnet
 
+import com.dispatchlabs.io.testing.common.contracts.DefaultSampleContract
 import org.testng.annotations.Test
 
 import static com.dispatchlabs.io.testing.common.APIs.*
@@ -40,4 +41,69 @@ class TestNetSmokeTest {
                 To:wallet1.Address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
     }
+
+    @Test(description="Transfer tokens from one delegate to another and then back again",groups = ["test net"])
+    public void transactions_TESTNET02(){
+        def wallet1 = createWallet()
+        def wallet2 = createWallet()
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:999, PrivateKey:"Genesis",
+                To:wallet1.Address ,From: "Genesis"
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:wallet1.Address,Status: "Ok", Balance: 999
+        response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:1, PrivateKey:"Genesis",
+                To:wallet2.Address ,From: "Genesis"
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:wallet2.Address,Status: "Ok", Balance: 1
+
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:500, PrivateKey:wallet1.PrivateKey,
+                To:wallet2.Address ,From: wallet1.Address
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:wallet2.Address,Status: "Ok", Balance: 501
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:501, PrivateKey:wallet2.PrivateKey,
+                To:wallet1.Address ,From: wallet2.Address
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:wallet2.Address,Status: "Ok", Balance: 0
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:wallet1.Address,Status: "Ok", Balance: 1000
+    }
+
+    @Test(description="Deploy contract",groups = ["test net"])
+    public void SmartContract_TESTNET03(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
+                Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
+        response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        def contractAddress = response.then().extract().path("data.contractAddress")
+    }
+
+    @Test(description="Get contract value",groups = ["test net"])
+    public void SmartContract_TESTNET04(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
+                Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
+        response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        def contractAddress = response.then().extract().path("data.contractAddress")
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+                ABI: DefaultSampleContract.defaultSampleABI,
+                Method: "getVar5",Params: []
+        def getID = response.Hash
+        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["aaaaaaaaaaaaa"])
+    }
+
+    @Test(description="Set contract value",groups = ["test net"])
+    public void SmartContract_TESTNET05(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
+                Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
+        response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        def contractAddress = response.then().extract().path("data.contractAddress")
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+                ABI: DefaultSampleContract.defaultSampleABI,
+                Method: "setVar5",Params: ["5555"]
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+                ABI: DefaultSampleContract.defaultSampleABI,
+                Method: "getVar5",Params: []
+        def getID = response.Hash
+        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["5555"])
+    }
+
 }
