@@ -94,9 +94,16 @@ class APIs {
         ]
         request.contentType(ContentType.JSON)
                 .body(JsonOutput.toJson(transaction))
-                .log().all()
+        if(params.Log != false){
+            request.log().all()
+        }
+        if(params.ReturnRequest == true){
+            return request
+        }
         Response response = request.post("/v1/transactions")
-        response.then().log().all()
+        if(params.Log != false){
+            response.then().log().all()
+        }
 
         //Verify response (optional)
         if(params.Status)
@@ -142,7 +149,9 @@ class APIs {
             response.then().log().all()
             if(params.DataStatus){
                 status = params.DataStatus
-                if(response.then().statusCode(200).extract().path("data.status") == params.DataStatus) return response
+                if (response.then().statusCode(200).extract().path("data") != null){
+                    if(response.then().statusCode(200).extract().path("data.status") == params.DataStatus) return response
+                }
             }
             else{
                 status = params.Status
@@ -155,7 +164,7 @@ class APIs {
     }
 
     public static verifyConsensusForAccount(def params){
-        return
+        sleep(10000)
         params.Nodes.each{Name,Node->
             RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
             request.baseUri("http://"+Node.IP+":"+Node.HttpPort)
@@ -169,6 +178,7 @@ class APIs {
     }
 
     public static verifyStatusForTransaction(def params){
+        sleep(10000)
         params.Nodes.each{Node->
             RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
             request.baseUri("http://"+Node.IP+":"+Node.HttpPort)
@@ -199,6 +209,7 @@ class APIs {
     }
 
     public static verifyTransactionsByFrom(def params){
+        sleep(10000)
         RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
         request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
         Response response = request.get("/v1/transactions/from/"+params.Address)
@@ -207,11 +218,35 @@ class APIs {
     }
 
     public static verifyTransactionsByTo(def params){
+        sleep(10000)
         RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
         request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
         Response response = request.get("/v1/transactions/to/"+params.Address)
         response.then().log().all()
 
+    }
+
+    public static createWallet(){
+        Key key = new Key();
+        byte[] publicKey = key.getPublicKeyBytes();
+
+        System.out.println(Utils.toHexString(publicKey));
+
+
+        byte[] hashablePublicKey = new byte[publicKey.length-1];
+        for (int i=1; i<publicKey.length; i++) {
+            hashablePublicKey[i-1] = publicKey[i];
+        }
+        Keccak.Digest256 keccak = new Keccak.Digest256();
+        keccak.update(hashablePublicKey);
+        byte[] hash = keccak.digest();
+
+        byte[] address = new byte[20];
+        for (int i=0; i<address.length; i++) {
+            address[i] = hash[i+12];
+        }
+
+        return [Address:Utils.toHexString(address),PrivateKey:key.getPrivateKey()];
     }
 
 }
