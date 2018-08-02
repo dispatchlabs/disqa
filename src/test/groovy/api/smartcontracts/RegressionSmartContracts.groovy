@@ -376,8 +376,8 @@ class RegressionSmartContracts {
         verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,DataStatus: "InternalError",HumanReadable: "argument count mismatch: 2 for 1")
     }
 
-    @Test(description="Get contract value",groups = ["smoke", "smart contract"])
-    public void SmartContract_APItest(){
+    @Test(description="Negative: Smart contract method throws an exception",groups = ["smart contract"])
+    public void SmartContract_API116(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:ComplexContract.contract,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
