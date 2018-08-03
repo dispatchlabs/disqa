@@ -184,10 +184,7 @@ class RegressionSmartContracts {
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
                 Method: "setVar5",Params: [false]
-        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        response.then().assertThat().body("type",equalTo("InvalidTransaction"))
-        //def getID = response.Hash
-        //verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:"5555")
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "InternalError", Timeout: 10
     }
 
     @Test(description="Pass invalid value for parameter type: hash",groups = ["smart contract"])
@@ -198,8 +195,7 @@ class RegressionSmartContracts {
         def contractAddress = response.then().extract().path("data.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
-                Method: "setVar5",Params: ["value":"5555"]
-        response.then().statusCode(500).assertThat().body("status",equalTo("JSON_PARSE_ERROR: value for field 'params' must be an array"))
+                Method: "setVar5",Params: ["value":"5555"],Status: "JSON_PARSE_ERROR: value for field 'params' must be an array"
     }
 
     @Test(description="Pass invalid value for parameter type: integer",groups = ["smart contract"])
@@ -210,8 +206,7 @@ class RegressionSmartContracts {
         def contractAddress = response.then().extract().path("data.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
-                Method: "setVar5",Params: 5555
-        response.then().statusCode(500).assertThat().body("status",equalTo("JSON_PARSE_ERROR: value for field 'params' must be an array"))
+                Method: "setVar5",Params: 5555,Status: "JSON_PARSE_ERROR: value for field 'params' must be an array"
     }
 
     @Test(description="Pass invalid value for parameter type: boolean",groups = ["smart contract"])
@@ -223,7 +218,7 @@ class RegressionSmartContracts {
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
                 Method: "boolParamType",Params: ["testStr"]
-        response.then().assertThat().body("type",equalTo("InvalidTransaction"))
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "InternalError", Timeout: 10
     }
 
     @Test(description="Contract returns no value",groups = ["smart contract"])
@@ -286,8 +281,7 @@ class RegressionSmartContracts {
         def contractAddress = response.then().extract().path("data.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: "",
-                Method: "setVar5",Params: ["10"]
-        response.then().statusCode(500).assertThat().body("status",equalTo("JSON_PARSE_ERROR: value for field 'abi' is invalid"))
+                Method: "setVar5",Params: ["10"],Status: "JSON_PARSE_ERROR: value for field 'abi' is invalid"
     }
 
     @Test(description="Negative: Invalid values for ABI",groups = ["smart contract"])
@@ -307,8 +301,7 @@ class RegressionSmartContracts {
     @Test(description="Negative: Empty smart contract",groups = ["smart contract"])
     public void SmartContract_API35(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
-                Code:"",ABI: DefaultSampleContract.defaultSampleABI
-        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+                Code:"",ABI: DefaultSampleContract.defaultSampleABI,Status: "JSON_PARSE_ERROR: value for field 'to' is invalid"
     }
 
     @Test(description="Negative: Partial bytecode of valid contract",groups = ["smart contract"])
