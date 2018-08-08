@@ -12,7 +12,6 @@ import javax.xml.bind.DatatypeConverter
 
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasItem
-import static org.hamcrest.Matchers.nullValue
 
 class APIs {
 
@@ -222,6 +221,14 @@ class APIs {
         RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
         request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
         Response response = request.get("/v1/transactions/to/"+params.Address)
+        response.then().log().all()
+
+    }
+
+    public static verifyQueue(def params){
+        RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
+        request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
+        Response response = request.get("/v1/queue")
         response.then().log().all()
 
     }

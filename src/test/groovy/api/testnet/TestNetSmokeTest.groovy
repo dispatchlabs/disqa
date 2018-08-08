@@ -10,11 +10,11 @@ class TestNetSmokeTest {
             [
                     Delegates:[
                         "Delegate0": [
-                            "IP": "35.230.0.126",
+                            "IP": "35.197.60.1",
                             "HttpPort": 1975
                         ],
                         "Delegate1": [
-                                "IP": "35.233.231.3",
+                                "IP": "35.203.166.220",
                                 "HttpPort": 1975
                         ]
                     ]
@@ -34,7 +34,7 @@ class TestNetSmokeTest {
             ]
     ]
 
-    @Test(description="Delegate to delegate: 1 token transfer",groups = ["test net"])
+    @Test(description="Genesis to delegate: 1 token transfer",groups = ["test net"])
     public void transactions_TESTNET01(){
         def wallet1 = createWallet()
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
