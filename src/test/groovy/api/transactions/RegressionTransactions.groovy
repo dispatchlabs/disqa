@@ -285,6 +285,14 @@ class RegressionTransactions {
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate2.address,Status: "NotFound"
     }
 
+    @Test(description="Negative buffer overflow number of tokens",groups = ["transactions"])
+    public void transactions_API119(){
+        def newAccount = Utils.createAccount()
+
+        sendTransaction Node:allNodes.Delegates.Delegate0, Value:99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999, PrivateKey:"Genesis",
+                To:newAccount.address ,From: "Genesis",Status: "InvalidTransaction"
+    }
+
     /*
     @Test(description="Decimal point tokens",groups = ["smoke", "transactions"])
     public void transactionRegression6_DelegateDecimalTokens(){

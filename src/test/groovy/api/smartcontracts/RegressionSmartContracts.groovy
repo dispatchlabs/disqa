@@ -382,4 +382,18 @@ class RegressionSmartContracts {
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
         verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["aaaaaaaaaaaaa"])
     }
+
+    @Test(description="Negative buffer overflow test with integer",groups = ["smart contract"])
+    public void SmartContract_API19(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
+                Code:ComplexContract.contract,ABI: ComplexContract.abi
+        response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        def contractAddress = response.then().extract().path("data.contractAddress")
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+                ABI: ComplexContract.abi,
+                Method: "intParam",Params: [99999999999999999999999999999999999999999999999999999999999999999999999999999]
+        def getID = response.Hash
+        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,humanReadableStatus:"abi: cannot use float64 as type ptr as argument")
+    }
 }
