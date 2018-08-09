@@ -20,7 +20,9 @@ dependencies {
 }
 
 test {
-    useTestNG()
+    useTestNG(){
+        includeGroups(project.findProperty('testGroups') ?: 'smoke')
+    }
     systemProperty "java.library.path", "${rootDir}/main/resources"
     //include 'com.dispatchlabs.io.testing/*'
     testLogging {
