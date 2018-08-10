@@ -3,14 +3,20 @@ package api.transactions
 import com.dispatchlabs.io.testing.common.NodeSetup
 import com.jayway.restassured.RestAssured
 import com.jayway.restassured.response.Response
+import com.jayway.restassured.specification.RequestSpecification
 import org.testng.annotations.Test
+
+import java.nio.charset.StandardCharsets
+import java.util.concurrent.CyclicBarrier
 
 import static com.dispatchlabs.io.testing.common.APIs.sendTransaction
 import static com.jayway.restassured.config.RestAssuredConfig.*
 import com.jayway.restassured.config.HttpClientConfig
 
+
 class Performance {
     def allNodes
+    CyclicBarrier gate;
 
     @Test(description="Send as many transactions as possible",groups = ["performance"])
     public void performance(){
@@ -18,11 +24,13 @@ class Performance {
         //RestAssured.config = newConfig().httpClient(HttpClientConfig.httpClientConfig().reuseHttpClientInstance());
         def users = []
         allNodes = NodeSetup.quickSetup Delegate: 4,Seed: 1,Regular: 0
-        4.times {
+        gate = new CyclicBarrier(10);
+        10.times {
             def user = new PerfUser()
             user.node = allNodes.Delegates.Delegate0
             users << user
             user.start()
+            user.gate = gate
         }
         println users.size()
         while(true){
@@ -41,24 +49,53 @@ class Performance {
 public class PerfUser extends Thread  {
     def node
     def count = 0
+    def gate
 
     @Override
     public void run() {
         while (true){
             def requests = []
-            500.times{
+            4000.times{
+                println it
                 def request = sendTransaction Node:node, Value:1, PrivateKey:"Genesis",
                         To:node.address ,From: "Genesis",Log: false,ReturnRequest:true
                 requests << request
-                sleep(1)
+                //sleep(1)
             }
+            gate.await()
             println "posting"
             //println requests.size()
-            requests.each {
-                Response response = it.post("/v1/transactions")
+            println new Date()
+            requests.each {RequestSpecification post->
+                URL url = new URL(requests[0].baseUri+"/v1/transactions")
+                URLConnection con = url.openConnection()
+                HttpURLConnection http = (HttpURLConnection)con
+                http.setRequestMethod("POST")
+                http.setDoOutput(true)
+                //http.setFixedLengthStreamingMode(length)
+                http.setRequestProperty("Content-Length", "439");
+                http.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
+                http.connect();
+                OutputStream os = http.getOutputStream()
+                byte[] out = requests[0].requestBody.getBytes(StandardCharsets.UTF_8)
+                os.write(out)
+                os.flush()
+                os.close()
+//                def buffer = new byte[1024];
+//                while ((http.getInputStream().read(buffer)) > 0) {
+//
+//                }
+                assert http.getResponseCode() == 200
+
+                //Response response = post.post("/v1/transactions")
+                //response.then().statusCode(200)
+                //sleep(300)
                 //response.then().log().all()
                 count++
             }
+            println new Date()
+            gate.await()
+            System.exit(0)
 //            sendTransaction Node:node, Value:1, PrivateKey:"Genesis",
 //                        To:node.address ,From: "Genesis",Log: false
 //            count++
