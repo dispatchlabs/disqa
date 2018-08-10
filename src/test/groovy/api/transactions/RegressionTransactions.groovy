@@ -306,6 +306,23 @@ class RegressionTransactions {
         }
     }
 
+
+    @Test(description="Genesis to Delegate token transfer",groups = ["transactions"])
+    public void transactions_APItest(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 999
+
+        response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
+        sleep(1000)
+        verifyQueue Node:allNodes.Delegates.Delegate2
+        //waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,DataStatus: "Ok", Timeout: 10
+        //verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 15
+        //verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 984
+    }
+
     /*
     @Test(description="Decimal point tokens",groups = ["smoke", "transactions"])
     public void transactionRegression6_DelegateDecimalTokens(){
