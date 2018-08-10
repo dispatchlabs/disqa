@@ -63,11 +63,14 @@ class NodeSetup {
         sleep(2000)
         if(directory.exists()){
             directory.deleteDir()
+            assert directory.exists() == false,"Error, unable to delete directory: ${directory}"
             directory.mkdirs()
         }
 
+
         def allDelegates = []
         def allSeeds = []
+        def seedAddresses = []
         //find all delegates and create a list of them
         nodeSetup.each { nodeID, setup ->
             setup.IP = thisIP
@@ -92,11 +95,12 @@ class NodeSetup {
                 "useQuantumEntropy": false,
                 "seedEndpoints": allSeeds,
                 //delegates:[],
+                isBookkeeper:true,
                 "genesisTransaction":genTransaction
         ]
-//            if(setup.IsSeed){
-//                config."delegates" = allDelegates
-//            }
+            if(setup.IsDelegate){
+                config."seedAddresses" = seedAddresses
+            }
             config = JsonOutput.toJson(config)
             def basePath = directory.getAbsolutePath()+"/"+nodeID
             new File(basePath).mkdir()
@@ -114,10 +118,9 @@ class NodeSetup {
             }
             setup.disgoProc = setup.startProcess()
         }
-        nodeSetup.each{nodeID,setup->
-            createNodeConfig(nodeID,setup)
-            //if(setup.IsDelegate) createNodeConfig(nodeID,setup)
-        }
+//        nodeSetup.each{nodeID,setup->
+//            if(setup.IsDelegate) createNodeConfig(nodeID,setup)
+//        }
 
         def getAddress = { nodeID, setup ->
             def basePath = directory.getAbsolutePath()+"/"+nodeID
@@ -137,19 +140,20 @@ class NodeSetup {
             assert false,"Error unable to get address from: ${nodeID} in 10 seconds"
         }
 
-        nodeSetup.each { nodeID, setup ->
-            getAddress(nodeID,setup)
-//            if(setup.IsDelegate) {
-//                getAddress(nodeID,setup)
-//                allDelegates << [endpoint:[host:"127.0.0.1",port:setup.GrpcPort],type:"Delegate",address:setup.address]
-//            }
+        nodeSetup.each{nodeID,setup->
+            if(setup.IsSeed) {
+                createNodeConfig(nodeID,setup)
+                getAddress(nodeID,setup)
+                seedAddresses << setup.address
+            }
         }
-//
-//        nodeSetup.each{nodeID,setup->
-//            if(setup.IsSeed) {
-//                createNodeConfig(nodeID,setup)
-//                getAddress(nodeID,setup)
-//            }
-//        }
+
+        nodeSetup.each { nodeID, setup ->
+            if(setup.IsDelegate) {
+                createNodeConfig(nodeID,setup)
+                getAddress(nodeID,setup)
+            }
+        }
+
     }
 }
