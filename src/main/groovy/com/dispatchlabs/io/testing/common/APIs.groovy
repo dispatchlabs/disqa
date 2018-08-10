@@ -230,7 +230,7 @@ class APIs {
         request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
         Response response = request.get("/v1/queue")
         response.then().log().all()
-
+        return response
     }
 
     public static createWallet(){
