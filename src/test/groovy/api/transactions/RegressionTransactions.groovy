@@ -15,8 +15,14 @@ class RegressionTransactions {
     @BeforeMethod(alwaysRun = true)
     public void baseState(){
         //create and start all needed nodes for each test
-        allNodes = NodeSetup.quickSetup Delegate: 4,Seed: 1,Regular: 0
+        allNodes = NodeSetup.quickSetup Delegate: 5,Seed: 1,Regular: 0
     }
+
+    //@AfterMethod
+    //public void afterState(){
+    //    println("sleep now")
+    //    sleep(20000)
+    //}
 
     @Test(description="Genesis to Delegate token transfer",groups = ["smoke", "transactions"])
     public void transactions_API101(){

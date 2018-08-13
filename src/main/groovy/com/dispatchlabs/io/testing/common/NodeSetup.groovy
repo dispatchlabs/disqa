@@ -63,7 +63,7 @@ class NodeSetup {
         sleep(2000)
         if(directory.exists()){
             directory.deleteDir()
-            assert directory.exists() == false,"Error, unable to delete directory: ${directory}"
+            //assert directory.exists() == false,"Error, unable to delete directory: ${directory}"
             directory.mkdirs()
         }
 
@@ -117,6 +117,7 @@ class NodeSetup {
                     .redirectErrorStream(true).start()
             }
             setup.disgoProc = setup.startProcess()
+            sleep(2000)
         }
 //        nodeSetup.each{nodeID,setup->
 //            if(setup.IsDelegate) createNodeConfig(nodeID,setup)
