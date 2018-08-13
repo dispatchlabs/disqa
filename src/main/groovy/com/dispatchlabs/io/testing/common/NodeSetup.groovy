@@ -155,6 +155,6 @@ class NodeSetup {
                 getAddress(nodeID,setup)
             }
         }
-
+        lastPort = 0
     }
 }

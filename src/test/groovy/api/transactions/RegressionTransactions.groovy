@@ -2,6 +2,7 @@ package api.transactions
 
 import com.dispatchlabs.io.testing.common.NodeSetup
 import com.dispatchlabs.io.testing.common.Utils
+import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 
@@ -207,7 +208,7 @@ class RegressionTransactions {
 
         response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 //To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,Time: 1576108301994,DataStatus: "JSON_PARSE_ERROR: transaction time cannot be in the future"
-                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,Time: System.currentTimeMillis()+30000000000,Status: "JSON_PARSE_ERROR: transaction time cannot be in the future"
+                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,Time: System.currentTimeMillis()+30000000000,Status: "StatusJsonParseError: transaction time cannot be in the future"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,Status: "NotFound", Timeout: 10
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 999
     }
@@ -309,6 +310,24 @@ class RegressionTransactions {
                     To:newAccount.address ,From: "Genesis"
             waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
             verifyConsensusForAccount Nodes:allNodes.Delegates, ID:newAccount.address,Status: "Ok", Balance: balance
+        }
+    }
+
+    @Test(description="Loop through 20 transactions, restart delegates verify consensus on each one",groups = ["smoke", "transactions"])
+    public void transactions_API121(){
+        def newAccount = Utils.createAccount()
+        def balance = 0
+        10.times{
+            balance++
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+                    To:newAccount.address ,From: "Genesis"
+            waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
+            verifyConsensusForAccount Nodes:allNodes.Delegates, ID:newAccount.address,Status: "Ok", Balance: balance
+            allNodes.Delegates.each{key,value->
+                value.disgoProc.destroy()
+                sleep 1000
+                value.startProcess()
+            }
         }
     }
 
