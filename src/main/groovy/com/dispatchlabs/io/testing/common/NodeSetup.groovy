@@ -117,6 +117,7 @@ class NodeSetup {
                     .redirectErrorStream(true).start()
             }
             setup.disgoProc = setup.startProcess()
+            sleep(2000)
         }
 //        nodeSetup.each{nodeID,setup->
 //            if(setup.IsDelegate) createNodeConfig(nodeID,setup)
@@ -154,6 +155,6 @@ class NodeSetup {
                 getAddress(nodeID,setup)
             }
         }
-
+        lastPort = 0
     }
 }
