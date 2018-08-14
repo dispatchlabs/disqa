@@ -16,7 +16,7 @@ class RegressionTransactions {
     @BeforeMethod(alwaysRun = true)
     public void baseState(){
         //create and start all needed nodes for each test
-        allNodes = NodeSetup.quickSetup Delegate: 4,Seed: 1,Regular: 0
+        allNodes = NodeSetup.quickSetup Delegate: 5,Seed: 1,Regular: 0
     }
 
     @Test(description="Genesis to Delegate token transfer",groups = ["smoke", "transactions"])
@@ -307,7 +307,7 @@ class RegressionTransactions {
         }
     }
 
-    @Test(description="Loop through 20 transactions, restart delegates verify consensus on each one",groups = ["smoke", "transactions"])
+    @Test(description="Loop through 10 transactions, restart delegates verify consensus on each one",groups = ["transactions"])
     public void transactions_API121(){
         def newAccount = Utils.createAccount()
         def balance = 0
@@ -323,6 +323,22 @@ class RegressionTransactions {
                 value.startProcess()
             }
         }
+    }
+
+    @Test(description="Test startup/shutdown of a Delegate.",groups = ["transactions"])
+    public void transactions_API122(){
+        def newAccount = Utils.createAccount()
+        def balance = 0
+        allNodes.Delegates.Delegate3.disgoProc.destroy()
+        20.times{
+            balance++
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+                    To:newAccount.address ,From: "Genesis"
+            waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
+        }
+        allNodes.Delegates.Delegate3.startProcess()
+        sleep(4000)
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:newAccount.address,Status: "Ok", Balance: balance
     }
 
 
