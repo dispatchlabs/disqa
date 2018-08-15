@@ -2,7 +2,6 @@ package api.transactions
 
 import com.dispatchlabs.io.testing.common.NodeSetup
 import com.dispatchlabs.io.testing.common.Utils
-import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 

@@ -16,7 +16,7 @@ class RegressionSmartContracts {
     @BeforeMethod(alwaysRun = true)
     public void baseState(){
         //create and start all needed nodes for each test
-        allNodes = NodeSetup.quickSetup Delegate: 4,Seed: 1,Regular: 0
+        allNodes = NodeSetup.quickSetup Delegate: 5,Seed: 1,Regular: 0
     }
 
     @Test(description="Deploy contract",groups = ["smoke", "smart contract"])
