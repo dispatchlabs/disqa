@@ -294,7 +294,7 @@ class RegressionTransactions {
                 To:newAccount.address ,From: "Genesis",Status: "InvalidTransaction"
     }
 
-    @Test(description="Loop through 20 transactions, verify consensus on each one",groups = ["smoke", "transactions"])
+    @Test(description="Loop through 10 transactions, verify consensus on each one",groups = ["smoke", "transactions"])
     public void transactions_API120(){
         def newAccount = Utils.createAccount()
         def balance = 0
@@ -356,6 +356,39 @@ class RegressionTransactions {
         //waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,DataStatus: "Ok", Timeout: 10
         //verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 15
         //verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 984
+    }
+
+    @Test(description="Negative: Try to do send transactions in incorrect order",groups = ["transactions"])
+    public void transactions_API123(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:1, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
+
+        def request1 = sendTransaction Node:allNodes.Delegates.Delegate1, Value:1, PrivateKey:allNodes.Delegates.Delegate1.privateKey,
+                To:allNodes.Delegates.Delegate0.address ,From: allNodes.Delegates.Delegate1.address,ReturnRequest:true
+        sleep(1)
+        def request2 = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,ReturnRequest:true
+
+        request2.post("/v1/transactions")
+        sleep(200)
+        request1.post("/v1/transactions")
+
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 1
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 0
+    }
+
+    @Test(description="Send 2 transactions with same timestamp",groups = ["transactions"])
+    public void transactions_API124(){
+        def time = System.currentTimeMillis()
+        sendTransaction Node:allNodes.Delegates.Delegate1, Value:1, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis",Time: time
+        def trans2 = sendTransaction Node:allNodes.Delegates.Delegate1, Value:1, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate1.address ,From: "Genesis",Time: time
+        waitForTransactionStatus ID:trans2.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
+
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 1
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 1
     }
 
     /*
