@@ -78,7 +78,7 @@ class NodeSetup {
             setup.GrpcPort = lastPort+1
             lastPort = lastPort+2
             //if(setup.IsDelegate == true) allDelegates << [host:"127.0.0.1",port:setup.GrpcPort]
-            if(setup.IsSeed == true) allSeeds << [host:"127.0.0.1",port:setup.GrpcPort]
+            //if(setup.IsSeed == true) allSeeds << [host:"127.0.0.1",port:setup.GrpcPort]
         }
 
         def createNodeConfig = {nodeID,setup->
@@ -98,9 +98,9 @@ class NodeSetup {
                 isBookkeeper:true,
                 "genesisTransaction":genTransaction
         ]
-            if(setup.IsDelegate){
-                config."seedAddresses" = seedAddresses
-            }
+//            if(setup.IsDelegate){
+//                config."seedAddresses" = seedAddresses
+//            }
             config = JsonOutput.toJson(config)
             def basePath = directory.getAbsolutePath()+"/"+nodeID
             new File(basePath).mkdir()
@@ -145,7 +145,8 @@ class NodeSetup {
             if(setup.IsSeed) {
                 createNodeConfig(nodeID,setup)
                 getAddress(nodeID,setup)
-                seedAddresses << setup.address
+                allSeeds << [host:"127.0.0.1",port:setup.GrpcPort,address:setup.address]
+                //seedAddresses << setup.address
             }
         }
 
