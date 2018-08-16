@@ -2,7 +2,6 @@ package api.transactions
 
 import com.dispatchlabs.io.testing.common.NodeSetup
 import com.dispatchlabs.io.testing.common.Utils
-import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 
@@ -18,6 +17,12 @@ class RegressionTransactions {
         //create and start all needed nodes for each test
         allNodes = NodeSetup.quickSetup Delegate: 5,Seed: 1,Regular: 0
     }
+
+    //@AfterMethod
+    //public void afterState(){
+    //    println("sleep now")
+    //    sleep(20000)
+    //}
 
     @Test(description="Genesis to Delegate token transfer",groups = ["smoke", "transactions"])
     public void transactions_API101(){
@@ -352,7 +357,12 @@ class RegressionTransactions {
         response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
         sleep(1000)
+        def response2 = sendTransaction Node:allNodes.Delegates.Delegate2, Value:40, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
+        sleep(1000)
         verifyQueue Node:allNodes.Delegates.Delegate2
+        println(response.Hash)
+        println(response2)
         //waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,DataStatus: "Ok", Timeout: 10
         //verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 15
         //verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 984

@@ -63,7 +63,7 @@ class NodeSetup {
         sleep(2000)
         if(directory.exists()){
             directory.deleteDir()
-            assert directory.exists() == false,"Error, unable to delete directory: ${directory}"
+            //assert directory.exists() == false,"Error, unable to delete directory: ${directory}"
             directory.mkdirs()
         }
 

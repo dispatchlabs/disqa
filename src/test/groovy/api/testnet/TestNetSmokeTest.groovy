@@ -8,7 +8,7 @@ import static com.dispatchlabs.io.testing.common.APIs.*
 class TestNetSmokeTest {
     def allNodes =
             [
-                    Delegates:[
+                    /*Delegates:[
                         "Delegate0": [
                             "IP": "35.197.60.1",
                             "HttpPort": 1975
@@ -17,6 +17,16 @@ class TestNetSmokeTest {
                                 "IP": "35.203.166.220",
                                 "HttpPort": 1975
                         ]
+                    ]*/
+                    Delegates:[
+                            "Delegate0": [
+                                    "IP": "127.0.0.1",
+                                    "HttpPort": 3552
+                            ],
+                            "Delegate1": [
+                                    "IP": "127.0.0.1",
+                                    "HttpPort": 3554
+                            ]
                     ]
             ]
     def allWallets = [
