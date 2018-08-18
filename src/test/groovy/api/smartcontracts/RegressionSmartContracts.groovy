@@ -317,7 +317,7 @@ class RegressionSmartContracts {
     @Test(description="Negative: Empty smart contract",groups = ["smart contract"])
     public void SmartContract_API35(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
-                Code:"",ABI: DefaultSampleContract.defaultSampleABI,Status: "JSON_PARSE_ERROR: value for field 'to' is invalid"
+                Code:"",ABI: DefaultSampleContract.defaultSampleABI,Status: "InvalidTransaction"
     }
 
     @Test(description="Negative: Partial bytecode of valid contract",groups = ["smart contract"])
@@ -326,7 +326,7 @@ class RegressionSmartContracts {
                 ABI: DefaultSampleContract.defaultSampleABI,
                 Code:"60806040523480156100105760"//DefaultSampleContract.defaultSample.substring(0,DefaultSampleContract.defaultSample.size()-10)
         def getID = response.Hash
-        response = waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "InvalidTransaction", Timeout: 10
+        response = waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "InternalError", Timeout: 10
     }
 
     @Test(description="Contract returns multiple values (2 strings)",groups = ["smart contract"])
