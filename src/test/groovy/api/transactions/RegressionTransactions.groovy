@@ -2,6 +2,8 @@ package api.transactions
 
 import com.dispatchlabs.io.testing.common.NodeSetup
 import com.dispatchlabs.io.testing.common.Utils
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 
@@ -399,6 +401,82 @@ class RegressionTransactions {
 
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 1
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 1
+    }
+
+    @Test(description="Shutdown seed, try transaction",groups = ["transactions"])
+    public void transactions_API125(){
+        allNodes.Seeds.Seed0.disgoProc.destroy()
+        sleep(1000)
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
+
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 1
+    }
+
+    @Test(description="Negative: Change delegate address see if transaction goes through",groups = ["transactions"])
+    public void transactions_API126(){
+        def account = new JsonSlurper().parseText(new File(allNodes.Delegates.Delegate0.configDir+"/account.json").text)
+        println account
+        account.address = "34cbcb5de0fab890bd2c1a3349783e47470ae333"
+        new File(allNodes.Delegates.Delegate0.configDir+"/account.json").write JsonOutput.toJson(account)
+        allNodes.Delegates.Delegate0.disgoProc.destroy()
+        sleep 1000
+        allNodes.Delegates.Delegate0.startProcess()
+        sleep(2000)
+        try{
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+                    To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+        }
+        catch (java.net.ConnectException ex){
+            return
+        }
+        assert false,"Transaction should not have gone through at all"
+    }
+
+    @Test(description="Negative: Change delegate private Key see if transaction goes through",groups = ["transactions"])
+    public void transactions_API127(){
+        def account = new JsonSlurper().parseText(new File(allNodes.Delegates.Delegate0.configDir+"/account.json").text)
+        account.privateKey = "f94edd5484eae95b7e5295eb005578d8e3ba7b9d20dbbf97d7c5d32fe4986444"
+        new File(allNodes.Delegates.Delegate0.configDir+"/account.json").write JsonOutput.toJson(account)
+        allNodes.Delegates.Delegate0.disgoProc.destroy()
+        sleep 1000
+        allNodes.Delegates.Delegate0.startProcess()
+        sleep(2000)
+        try{
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+                    To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+        }
+        catch (java.net.ConnectException ex){
+            return
+        }
+        assert false,"Transaction should not have gone through at all"
+    }
+
+    @Test(description="Negative: Change seed private Key see if delegates can start up",groups = ["transactions"])
+    public void transactions_API128(){
+        def account = new JsonSlurper().parseText(new File(allNodes.Seeds.Seed0.configDir+"/account.json").text)
+        account.privateKey = "f94edd5484eae95b7e5295eb005578d8e3ba7b9d20dbbf97d7c5d32fe4986444"
+        new File(allNodes.Seeds.Seed0.configDir+"/account.json").write JsonOutput.toJson(account)
+        allNodes.Seeds.Seed0.disgoProc.destroy()
+        sleep 1000
+        allNodes.Seeds.Seed0.startProcess()
+        sleep(2000)
+
+        allNodes.Delegates.Delegate0.disgoProc.destroy()
+        sleep 1000
+        allNodes.Delegates.Delegate0.startProcess()
+        sleep(2000)
+
+        try{
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+                    To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+        }
+        catch (java.net.ConnectException ex){
+            return
+        }
+        assert false,"Transaction should not have gone through at all"
     }
 
     /*

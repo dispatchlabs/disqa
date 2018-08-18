@@ -106,7 +106,7 @@ class NodeSetup {
             def basePath = directory.getAbsolutePath()+"/"+nodeID
             new File(basePath).mkdir()
             new File(basePath+"/config").mkdir()
-            setup.configDir = new File(basePath+"/config/config.json").absolutePath
+            setup.configDir = new File(basePath+"/config").absolutePath
             new File(basePath+"/config/config.json").write config
             def exeName = "disgo"
             if(System.getProperty("os.name").toLowerCase().contains("win")){
