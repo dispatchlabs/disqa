@@ -93,7 +93,7 @@ class NodeSetup {
                 ],
                 "grpcTimeout": 5,
                 "useQuantumEntropy": false,
-                "seedEndpoints": allSeeds,
+                "seeds": allSeeds,
                 //delegates:[],
                 isBookkeeper:true,
                 "genesisTransaction":genTransaction
@@ -102,9 +102,11 @@ class NodeSetup {
 //                config."seedAddresses" = seedAddresses
 //            }
             config = JsonOutput.toJson(config)
+            setup.config = config
             def basePath = directory.getAbsolutePath()+"/"+nodeID
             new File(basePath).mkdir()
             new File(basePath+"/config").mkdir()
+            setup.configDir = new File(basePath+"/config/config.json").absolutePath
             new File(basePath+"/config/config.json").write config
             def exeName = "disgo"
             if(System.getProperty("os.name").toLowerCase().contains("win")){
@@ -145,7 +147,7 @@ class NodeSetup {
             if(setup.IsSeed) {
                 createNodeConfig(nodeID,setup)
                 getAddress(nodeID,setup)
-                allSeeds << [host:"127.0.0.1",port:setup.GrpcPort,address:setup.address]
+                allSeeds << [type:"Seed",grpcEndpoint:[host:"127.0.0.1",port:setup.GrpcPort],httpEndpoint:[host:"127.0.0.1",port:setup.HttpPort],address:setup.address]
                 //seedAddresses << setup.address
             }
         }
