@@ -27,11 +27,17 @@ class MonkeyTest {
     private verifyTransactions(){
         def transactions = []
         allNodes.Delegates.each{nodeID,node->
-            RequestSpecification request = RestAssured.given()
-            request.baseUri("http://"+allNodes.Delegates."${nodeID}".IP+":"+allNodes.Delegates."${nodeID}".HttpPort)
-            Response response = request.get("/v1/transactions")
-            response.then().log().all()
-            transactions.addAll(response.then().statusCode(200).extract().path("data"))
+            def page = 1
+            while(true){
+                RequestSpecification request = RestAssured.given()
+                request.baseUri("http://"+allNodes.Delegates."${nodeID}".IP+":"+allNodes.Delegates."${nodeID}".HttpPort)
+                Response response = request.get("/v1/transactions?page=$page")
+                println page
+                def getTrans = response.then().statusCode(200).extract().path("data")
+                if(getTrans.size() == 0) break
+                transactions.addAll(getTrans)
+                page++
+            }
         }
         ledger.each {transaction->
             assert transactions.find{it.hash == transaction.TransID} != null,"Error transaction with hash: ${transaction.TransID} was not found."
