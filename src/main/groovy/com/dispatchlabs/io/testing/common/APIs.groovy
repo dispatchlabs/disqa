@@ -107,6 +107,9 @@ class APIs {
         //Verify response (optional)
         if(params.Status)
             response.then().assertThat().body("status",equalTo(params.Status))
+        if(params.StatusCode){
+            assert response.getStatusCode() == params.StatusCode
+        }
 
         return [Hash:hash,Response:response]
     }
@@ -146,15 +149,18 @@ class APIs {
             request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
             Response response = request.get("/v1/receipts/"+params.ID)
             response.then().log().all()
+            if(params.StatusCode){
+                assert response.getStatusCode() == params.StatusCode
+            }
             if(params.DataStatus){
                 status = params.DataStatus
-                if (response.then().statusCode(200).extract().path("data") != null){
-                    if(response.then().statusCode(200).extract().path("data.status") == params.DataStatus) return response
+                if (response.then().extract().path("data") != null){
+                    if(response.then().extract().path("data.status") == params.DataStatus) return response
                 }
             }
             else{
                 status = params.Status
-                if(response.then().statusCode(200).extract().path("status") == params.Status) return response
+                if(response.then().extract().path("status") == params.Status) return response
             }
             sleep(1000)
             timeout--
@@ -211,7 +217,7 @@ class APIs {
         sleep(10000)
         RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
         request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
-        Response response = request.get("/v1/transactions/from/"+params.Address)
+        Response response = request.get("/v1/transactions?from="+params.Address)
         response.then().log().all()
 
     }
@@ -220,7 +226,7 @@ class APIs {
         sleep(10000)
         RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
         request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
-        Response response = request.get("/v1/transactions/to/"+params.Address)
+        Response response = request.get("/v1/transactions?to="+params.Address)
         response.then().log().all()
 
     }
@@ -254,6 +260,22 @@ class APIs {
         }
 
         return [Address:Utils.toHexString(address),PrivateKey:key.getPrivateKey()];
+    }
+
+    public static def getTransactions(def params){
+        RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
+        request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
+        Response response = request.get("/v1/transactions?page=$params.Page")
+        response.then().log().all()
+        return response.then().statusCode(200).extract().path("data")
+    }
+
+    public static def getAccounts(def params){
+        RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
+        request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
+        Response response = request.get("/v1/accounts?page=$params.Page")
+        response.then().log().all()
+        return response.then().statusCode(200).extract().path("data")
     }
 
 }

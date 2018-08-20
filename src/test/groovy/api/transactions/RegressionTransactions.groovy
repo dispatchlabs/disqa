@@ -17,7 +17,7 @@ class RegressionTransactions {
     @BeforeMethod(alwaysRun = true)
     public void baseState(){
         //create and start all needed nodes for each test
-        allNodes = NodeSetup.quickSetup Delegate: 5,Seed: 1,Regular: 0
+        allNodes = NodeSetup.quickSetup Delegate: 5,Seed: 1,Regular: 1
     }
 
     //@AfterMethod
@@ -149,15 +149,16 @@ class RegressionTransactions {
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 999
 
+        def time = System.currentTimeMillis()
         response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
-                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Time:1530124068969
+                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Time:time
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,DataStatus: "Ok", Timeout: 10
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 15
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 984
 
         println("Sending same transaction again.")
         sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
-                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Time:1530124068969,Status: "DuplicateTransaction"
+                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Time:time,Status: "DuplicateTransaction"
         sleep(2000)
         //waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate1, Timeout: 10
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 15
@@ -173,7 +174,7 @@ class RegressionTransactions {
 
         response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:1, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:"" ,From: allNodes.Delegates.Delegate0.address
-        response.Response.then().statusCode(200).assertThat().body("status",equalTo("InvalidTransaction"))
+        response.Response.then().statusCode(400).assertThat().body("status",equalTo("InvalidTransaction"))
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 999
     }
 
@@ -210,7 +211,7 @@ class RegressionTransactions {
         response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 //To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,Time: 1576108301994,DataStatus: "JSON_PARSE_ERROR: transaction time cannot be in the future"
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,Time: System.currentTimeMillis()+30000000000,Status: "StatusJsonParseError: transaction time cannot be in the future"
-        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,Status: "NotFound", Timeout: 10
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,StatusCode:404,Status: "NotFound", Timeout: 10
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 999
     }
 
@@ -223,7 +224,7 @@ class RegressionTransactions {
 
         response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,Time: System.currentTimeMillis()+200,Status: "StatusJsonParseError: transaction time cannot be in the future"
-        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,Status: "NotFound", Timeout: 10
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,StatusCode: 404,Status: "NotFound", Timeout: 10
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 999
     }
 
@@ -337,14 +338,14 @@ class RegressionTransactions {
         def newAccount = Utils.createAccount()
         def balance = 0
         allNodes.Delegates.Delegate3.disgoProc.destroy()
-        20.times{
+        5.times{
             balance++
             def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
                     To:newAccount.address ,From: "Genesis"
             waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
         }
         allNodes.Delegates.Delegate3.startProcess()
-        sleep(4000)
+        sleep(10000)
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:newAccount.address,Status: "Ok", Balance: balance
     }
 
@@ -479,6 +480,61 @@ class RegressionTransactions {
         assert false,"Transaction should not have gone through at all"
     }
 
+    @Test(description="Negative:send transaction older than ten seconds",groups = ["transactions"])
+    public void transactions_API129(){
+        def time = System.currentTimeMillis()
+        sleep(11000)
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis",Time:time,Status: "StatusTransactionTimeOut"
+    }
+
+    @Test(description="Negative:send transaction to regular node",groups = ["transactions"])
+    public void transactions_API130(){
+        sendTransaction Node:allNodes.Regulars.Regular0, Value:999, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis",Status: "StatusNotDelegate",StatusCode:418
+    }
+
+    @Test(description="Test transaction pagination",groups = ["transactions"])
+    public void transactions_API131(){
+        def transactions = []
+        11.times{
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+                    To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+            transactions.add(0,response.Hash)
+            //transactions << response.Hash
+            sleep(1)
+        }
+        sleep(10000)
+        def transactionsGet = getTransactions(Node:allNodes.Delegates.Delegate0,Page: 1)
+        assert transactionsGet.size() == 10
+        transactionsGet.eachWithIndex {trans,index->
+            assert trans.hash == transactions[index]
+        }
+        transactionsGet = getTransactions(Node:allNodes.Delegates.Delegate0,Page: 2)
+        assert transactionsGet.size() == 10
+        assert transactionsGet[0].hash == transactions[10]
+    }
+
+    @Test(description="Test accounts pagination",groups = ["transactions"])
+    public void transactions_API132(){
+        def accounts = []
+        11.times{
+            def wallet = createWallet()
+            accounts.add(0,wallet)
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+                    To:wallet.Address ,From: "Genesis"
+            sleep(1)
+        }
+        sleep(10000)
+        def accountsGet = getAccounts(Node:allNodes.Delegates.Delegate0,Page: 1)
+        assert accountsGet.size() == 10
+        accountsGet.eachWithIndex {acc,index->
+            assert acc.address == accounts[index].Address
+        }
+        accountsGet = getAccounts(Node:allNodes.Delegates.Delegate0,Page: 2)
+        assert accountsGet.size() == 10
+        assert accountsGet[0].address == accounts[0].Address
+    }
     /*
     @Test(description="Decimal point tokens",groups = ["smoke", "transactions"])
     public void transactionRegression6_DelegateDecimalTokens(){
