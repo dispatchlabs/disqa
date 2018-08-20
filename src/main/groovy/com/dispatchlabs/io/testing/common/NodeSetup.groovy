@@ -41,7 +41,7 @@ class NodeSetup {
         if(params.Regular) {
             returnNodes.Regulars = [:]
             params.Regular.times {
-                returnNodes.Regulars["Regular$it"] = [IsDelegate: false, IsSeed: false]
+                returnNodes.Regulars["Regular$it"] = [IsRegular:true,IsDelegate: false, IsSeed: false]
                 allNodes["Regular$it"] = returnNodes.Regulars["Regular$it"]
             }
         }
@@ -119,7 +119,7 @@ class NodeSetup {
                     .redirectErrorStream(true).start()
             }
             setup.disgoProc = setup.startProcess()
-            sleep(2000)
+            //sleep(2000)
         }
 //        nodeSetup.each{nodeID,setup->
 //            if(setup.IsDelegate) createNodeConfig(nodeID,setup)
@@ -153,11 +153,33 @@ class NodeSetup {
         }
 
         nodeSetup.each { nodeID, setup ->
-            if(setup.IsDelegate) {
+            if(setup.IsDelegate || setup.IsRegular) {
                 createNodeConfig(nodeID,setup)
                 getAddress(nodeID,setup)
+                //if(setup.IsDelegate) allDelegates << [type:"Delegate",grpcEndpoint:[host:"127.0.0.1",port:setup.GrpcPort],httpEndpoint:[host:"127.0.0.1",port:setup.HttpPort],address:setup.address]
+                if(setup.IsDelegate) allDelegates << setup.address
             }
         }
+
+        nodeSetup.each{nodeID,setup->
+            if(setup.IsSeed) {
+                def config = new JsonSlurper().parseText(new File(setup.configDir+"/config.json").text)
+                config.delegateAddresses = allDelegates
+                new File(setup.configDir+"/config.json").write JsonOutput.toJson(config)
+                setup.disgoProc.destroy()
+                setup.startProcess()
+                sleep(2000)
+            }
+        }
+
+        nodeSetup.each { nodeID, setup ->
+            if(setup.IsDelegate || setup.IsRegular) {
+                setup.disgoProc.destroy()
+                setup.startProcess()
+                sleep(2000)
+            }
+        }
+
         lastPort = 0
     }
 }
