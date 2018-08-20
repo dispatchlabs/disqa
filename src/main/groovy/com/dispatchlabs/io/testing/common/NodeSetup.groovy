@@ -168,7 +168,7 @@ class NodeSetup {
                 new File(setup.configDir+"/config.json").write JsonOutput.toJson(config)
                 setup.disgoProc.destroy()
                 sleep(1000)
-                setup.startProcess()
+                setup.disgoProc = setup.startProcess()
                 sleep(2000)
             }
         }

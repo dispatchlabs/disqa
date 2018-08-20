@@ -39,6 +39,8 @@ class APIs {
         if(params.Time!=null)
             time = params.Time
         else
+            //give 400 milliseconds to get hash
+            //time = System.currentTimeMillis()+400
             time = System.currentTimeMillis()
 
         def code = ""
@@ -100,6 +102,7 @@ class APIs {
             return request
         }
         Response response = request.post("/v1/transactions")
+        println System.currentTimeMillis()
         if(params.Log != false){
             response.then().log().all()
         }

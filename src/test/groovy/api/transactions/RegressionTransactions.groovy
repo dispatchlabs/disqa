@@ -152,11 +152,9 @@ class RegressionTransactions {
         def time = System.currentTimeMillis()
         response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Time:time
-        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,DataStatus: "Ok", Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 15
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 984
 
         println("Sending same transaction again.")
+        sleep(300)
         sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Time:time,Status: "DuplicateTransaction"
         sleep(2000)
