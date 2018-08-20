@@ -55,7 +55,7 @@ public class PerfUser extends Thread  {
     public void run() {
         while (true){
             def requests = []
-            500.times{
+            400.times{
                 println it
                 def request = sendTransaction Node:node, Value:1, PrivateKey:"Genesis",
                         To:node.address ,From: "Genesis",Log: false,ReturnRequest:true
@@ -72,7 +72,7 @@ public class PerfUser extends Thread  {
                 HttpURLConnection http = (HttpURLConnection)con
                 http.setRequestMethod("POST")
                 http.setDoOutput(true)
-                //http.setFixedLengthStreamingMode(length)
+                http.setFixedLengthStreamingMode(439)
                 http.setRequestProperty("Content-Length", "439");
                 http.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
                 http.connect();
@@ -85,11 +85,12 @@ public class PerfUser extends Thread  {
 //                while ((http.getInputStream().read(buffer)) > 0) {
 //
 //                }
-                assert http.getResponseCode() == 200
+                //http.getResponseCode()
+                //assert http.getResponseCode() == 200
 
                 //Response response = post.post("/v1/transactions")
                 //response.then().statusCode(200)
-                //sleep(300)
+                sleep(300)
                 //response.then().log().all()
                 count++
             }

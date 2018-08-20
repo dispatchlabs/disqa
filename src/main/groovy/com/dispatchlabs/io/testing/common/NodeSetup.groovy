@@ -167,6 +167,7 @@ class NodeSetup {
                 config.delegateAddresses = allDelegates
                 new File(setup.configDir+"/config.json").write JsonOutput.toJson(config)
                 setup.disgoProc.destroy()
+                sleep(1000)
                 setup.startProcess()
                 sleep(2000)
             }
@@ -175,7 +176,7 @@ class NodeSetup {
         nodeSetup.each { nodeID, setup ->
             if(setup.IsDelegate || setup.IsRegular) {
                 setup.disgoProc.destroy()
-                setup.startProcess()
+                setup.disgoProc = setup.startProcess()
                 sleep(2000)
             }
         }

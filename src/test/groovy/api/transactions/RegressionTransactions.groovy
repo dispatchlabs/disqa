@@ -480,10 +480,10 @@ class RegressionTransactions {
         assert false,"Transaction should not have gone through at all"
     }
 
-    @Test(description="Negative:send transaction older than ten seconds",groups = ["transactions"])
+    @Test(description="Negative:send transaction older than 1 second",groups = ["transactions"])
     public void transactions_API129(){
         def time = System.currentTimeMillis()
-        sleep(11000)
+        sleep(1400)
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis",Time:time,Status: "StatusTransactionTimeOut"
     }
