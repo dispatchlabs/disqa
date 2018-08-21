@@ -24,8 +24,8 @@ class Performance {
         //RestAssured.config = newConfig().httpClient(HttpClientConfig.httpClientConfig().reuseHttpClientInstance());
         def users = []
         allNodes = NodeSetup.quickSetup Delegate: 4,Seed: 1,Regular: 0
-        gate = new CyclicBarrier(1);
-        1.times {
+        gate = new CyclicBarrier(2);
+        2.times {
             def user = new PerfUser()
             user.node = allNodes.Delegates.Delegate0
             users << user
@@ -55,7 +55,7 @@ public class PerfUser extends Thread  {
     public void run() {
         while (true){
             def requests = []
-            400.times{
+            3000.times{
                 println it
                 def request = sendTransaction Node:node, Value:1, PrivateKey:"Genesis",
                         To:node.address ,From: "Genesis",Log: false,ReturnRequest:true
@@ -66,6 +66,7 @@ public class PerfUser extends Thread  {
             println "posting"
             //println requests.size()
             println new Date()
+            println System.currentTimeMillis()
             requests.each {RequestSpecification post->
                 URL url = new URL(requests[0].baseUri+"/v1/transactions")
                 URLConnection con = url.openConnection()
@@ -90,11 +91,12 @@ public class PerfUser extends Thread  {
 
                 //Response response = post.post("/v1/transactions")
                 //response.then().statusCode(200)
-                sleep(300)
+                sleep(10)
                 //response.then().log().all()
                 count++
             }
             println new Date()
+            println System.currentTimeMillis()
             gate.await()
             System.exit(0)
 //            sendTransaction Node:node, Value:1, PrivateKey:"Genesis",
