@@ -478,6 +478,61 @@ class RegressionTransactions {
         assert false,"Transaction should not have gone through at all"
     }
 
+    @Test(description="Negative: Change seed address see if transaction goes through",groups = ["transactions"])
+    public void transactions_API133(){
+        def account = new JsonSlurper().parseText(new File(allNodes.Seeds.Seed0.configDir+"/account.json").text)
+        println account
+        account.address = "34cbcb5de0fab890bd2c1a3349783e47470ae333"
+        new File(allNodes.Seeds.Seed0.configDir+"/account.json").write JsonOutput.toJson(account)
+        allNodes.Seeds.Seed0.disgoProc.destroy()
+        sleep 1000
+        allNodes.Seeds.Seed0.startProcess()
+        sleep(2000)
+
+        allNodes.Delegates.Delegate0.disgoProc.destroy()
+        sleep 1000
+        allNodes.Delegates.Delegate0.startProcess()
+        sleep(2000)
+
+        try{
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+                    To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+        }
+        catch (java.net.ConnectException ex){
+            return
+        }
+        assert false,"Transaction should not have gone through at all"
+    }
+
+    @Test(description="Negative: Change seed address and private key that matches and see if transaction goes through",groups = ["transactions"])
+    public void transactions_API134(){
+        def wallet = createWallet()
+        def account = new JsonSlurper().parseText(new File(allNodes.Seeds.Seed0.configDir+"/account.json").text)
+        println account
+        account.address = wallet.Address
+        account.privateKey = wallet.PrivateKey
+
+        new File(allNodes.Seeds.Seed0.configDir+"/account.json").write JsonOutput.toJson(account)
+        allNodes.Seeds.Seed0.disgoProc.destroy()
+        sleep 1000
+        allNodes.Seeds.Seed0.startProcess()
+        sleep(2000)
+
+        allNodes.Delegates.Delegate0.disgoProc.destroy()
+        sleep 1000
+        allNodes.Delegates.Delegate0.startProcess()
+        sleep(2000)
+
+        try{
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+                    To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+        }
+        catch (java.net.ConnectException ex){
+            return
+        }
+        assert false,"Transaction should not have gone through at all"
+    }
+
     @Test(description="Negative:send transaction older than 1 second",groups = ["transactions"])
     public void transactions_API129(){
         def time = System.currentTimeMillis()
