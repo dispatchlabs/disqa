@@ -151,7 +151,6 @@ class NodeSetup {
                 //seedAddresses << setup.address
             }
         }
-
         nodeSetup.each { nodeID, setup ->
             if(setup.IsDelegate || setup.IsRegular) {
                 createNodeConfig(nodeID,setup)
@@ -160,6 +159,7 @@ class NodeSetup {
                 if(setup.IsDelegate) allDelegates << setup.address
             }
         }
+        lastPort = 0
 
         nodeSetup.each{nodeID,setup->
             if(setup.IsSeed) {
@@ -167,9 +167,9 @@ class NodeSetup {
                 config.delegateAddresses = allDelegates
                 new File(setup.configDir+"/config.json").write JsonOutput.toJson(config)
                 setup.disgoProc.destroy()
-                sleep(1000)
+                //sleep(1000)
                 setup.disgoProc = setup.startProcess()
-                sleep(2000)
+                //sleep(2000)
             }
         }
 
@@ -181,6 +181,5 @@ class NodeSetup {
             }
         }
 
-        lastPort = 0
     }
 }

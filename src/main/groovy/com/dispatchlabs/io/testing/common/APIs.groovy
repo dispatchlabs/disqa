@@ -39,9 +39,8 @@ class APIs {
         if(params.Time!=null)
             time = params.Time
         else
-            //give 400 milliseconds to get hash
-            //time = System.currentTimeMillis()+400
             time = System.currentTimeMillis()
+        //println time
 
         def code = ""
         def method = ""
@@ -74,8 +73,17 @@ class APIs {
         Keccak.Digest256 digestSHA3 = new Keccak.Digest256();
         digestSHA3.update(byteArrayOutputStream.toByteArray());
         byte[] hashBytes = digestSHA3.digest();
-        String hash = Hex.toHexString(hashBytes)
-        String signatureStr = Utils.sign(privateKey,hash)
+        String hash
+        if(params.Hash)
+            hash = params.Hash
+        else
+            hash = Hex.toHexString(hashBytes)
+
+        String signatureStr
+        if(params.Signature)
+            signatureStr = params.Signature
+        else
+            signatureStr = Utils.sign(privateKey,hash)
 
         def transaction = [
                 code:code,
@@ -263,6 +271,14 @@ class APIs {
         }
 
         return [Address:Utils.toHexString(address),PrivateKey:key.getPrivateKey()];
+    }
+
+    public static def getTransaction(def params){
+        RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
+        request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
+        Response response = request.get("/v1/transactions/${params.Hash}")
+        response.then().log().all()
+        return response.then().statusCode(200).extract().path("data")
     }
 
     public static def getTransactions(def params){
