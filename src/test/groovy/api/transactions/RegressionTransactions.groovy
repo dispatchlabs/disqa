@@ -336,6 +336,7 @@ class RegressionTransactions {
         def newAccount = Utils.createAccount()
         def balance = 0
         allNodes.Delegates.Delegate3.disgoProc.destroy()
+        sleep(5000)
         5.times{
             balance++
             def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
@@ -588,6 +589,73 @@ class RegressionTransactions {
         assert accountsGet.size() == 10
         assert accountsGet[0].address == accounts[0].Address
     }
+
+    @Test(description="Verify /v1/transactions/ID api",groups = ["transactions"])
+    public void transactions_API135(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
+        def transaction = getTransaction(Node:allNodes.Delegates.Delegate0,Hash:response.Hash)
+        assert transaction.gossip != null
+        assert transaction.receipt != null
+        assert transaction.hash != null
+
+    }
+
+    @Test(description="Negative: send transaction from wallet with wrong private key",groups = ["transactions"])
+    public void transactions_API136(){
+        def wallet = createWallet()
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
+                To:wallet.Address ,From: "Genesis"
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
+        println wallet.PrivateKey
+        wallet.PrivateKey = "AA"+wallet.PrivateKey.substring(2,wallet.PrivateKey.size()-1)
+        println wallet.PrivateKey
+        sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:wallet.PrivateKey,
+                To:allNodes.Delegates.Delegate0.address ,From: wallet.Address,StatusCode: 400,Status: "InvalidTransaction"
+
+    }
+
+    @Test(description="Shut down 2 nodes, verify gossip",groups = ["transactions"])
+    public void transactions_API137(){
+        println allNodes.Delegates.Delegate3.disgoProc.destroy()
+        println allNodes.Delegates.Delegate4.disgoProc.destroy()
+        sleep(5000)
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 20
+        def transaction = getTransaction(Node:allNodes.Delegates.Delegate0,Hash:response.Hash)
+        assert transaction.gossip.size() == 3,"Error expected 3 gossip entries, got ${transaction.gossip.size()}"
+        def expectedDelegates = [allNodes.Delegates.Delegate0,allNodes.Delegates.Delegate1,allNodes.Delegates.Delegate2]
+        expectedDelegates.each{delegate->
+            assert transaction.gossip.find{it.address == delegate.Address},"Error Delegate: ${delegate} was not found is gossip array."
+        }
+    }
+
+    @Test(description="Negative: send incorrect hash",groups = ["transactions"])
+    public void transactions_API138(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis",Status: "InvalidTransaction",Hash:"509bdbf27d0d04a5fe9828da1b191f3fbca3121803374aa3ad00fec52b0a5bf6"
+    }
+
+    @Test(description="Negative: send incorrect signature",groups = ["transactions"])
+    public void transactions_API139(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis",Status: "InvalidTransaction",Signature:"ED12C3120B9D2FA329E463EC2EBBB600DAEB63B58867B13A30DFD396EBCC6F4441BAB883383CAF40EB9093BAEF846DCDC719714E33FC4DAA22ED43C6B0D1DB2800"
+    }
+
+    @Test(description="Negative: send incorrect from",groups = ["transactions"])
+    public void transactions_API140(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "3ed25f42484d517cdfc72cafb7ebc9e8baa5AAAA",Status: "InvalidTransaction"
+    }
+
+    @Test(description="Negative: send incorrect to",groups = ["transactions"])
+    public void transactions_API141(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
+                To:"1111" ,From: "Genesis",Status: "InvalidTransaction"
+    }
+
     /*
     @Test(description="Decimal point tokens",groups = ["smoke", "transactions"])
     public void transactionRegression6_DelegateDecimalTokens(){

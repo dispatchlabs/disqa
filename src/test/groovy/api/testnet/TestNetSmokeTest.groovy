@@ -1,6 +1,11 @@
 package api.testnet
 
 import com.dispatchlabs.io.testing.common.contracts.DefaultSampleContract
+import com.jayway.restassured.RestAssured
+import com.jayway.restassured.http.ContentType
+import com.jayway.restassured.response.Response
+import com.jayway.restassured.specification.RequestSpecification
+import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
 import static com.dispatchlabs.io.testing.common.APIs.*
@@ -29,27 +34,35 @@ class TestNetSmokeTest {
                             ]
                     ]*/
             ]
-    def allWallets = [
-            Wallet0:[
-                    "address": "81418cd6b383cc474a6cd3a3e928be8ed6d83d6d",
-                    "privateKey": "de2bd07d0e3366ab727f4175de143b4cfe5e21f359a80ad2336b8c98b6dcdffb"
-            ],
-            Wallet1:[
-                    "Address": "f2c79f5fca181a8e34b249a5585e7fb35c4a1981",
-                    "PrivateKey": "68260c297fe906e1794b21f35d33a96e5085314a7232f9c65a3cccf7f145a328"
-            ],
-            Wallet2:[
-                    "Address": "fa128e7340acc30659e18fdb3958a40bfb366644",
-                    "PrivateKey": "51ba1d72203fda615721c15ff2562a913c6c9743ee01251a4dcecbe1e02b0af6"
-            ]
-    ]
 
-    @Test(description="Genesis to delegate: 1 token transfer",groups = ["test net"])
+    @BeforeClass
+    public void findAllNodes(){
+        RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
+        request.baseUri("http://35.230.56.85:1975")
+        Response response = request.get("/v1/delegates")
+        response.then().log().all()
+        def delegates = response.then().extract().path("data")
+        allNodes = [:]
+        allNodes.Delegates = [:]
+        delegates.eachWithIndex{delegate,index->
+            allNodes.Delegates."Delegate$index" = [
+                    "IP": delegate.httpEndpoint.host,
+                    "HttpPort": delegate.httpEndpoint.port
+            ]
+        }
+    }
+
+    @Test(description="Genesis to all delegates: 1 token transfer",groups = ["test net"])
     public void transactions_TESTNET01(){
         def wallet1 = createWallet()
-        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
-                To:wallet1.Address ,From: "Genesis"
-        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        def balance = 0
+        allNodes.Delegates.each{key,delegate->
+            balance++
+            def response = sendTransaction Node:delegate, Value:1, PrivateKey:"Genesis",
+                    To:wallet1.Address ,From: "Genesis"
+            waitForTransactionStatus ID:response.Hash ,Node:delegate, DataStatus: "Ok", Timeout: 10
+        }
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:wallet1.Address,Status: "Ok", Balance: balance
     }
 
     @Test(description="Transfer tokens from one delegate to another and then back again",groups = ["test net"])
