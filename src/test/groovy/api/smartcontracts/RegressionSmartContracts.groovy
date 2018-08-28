@@ -408,4 +408,14 @@ class RegressionSmartContracts {
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
         verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,humanReadableStatus:"abi: cannot use float64 as type ptr as argument")
     }
+
+    @Test(description="Deploy contract",groups = ["smart contract"])
+    public void SmartContract_API1111(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
+                Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
+        response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        def contractAddress = response.then().extract().path("data.contractAddress")
+        println(contractAddress)
+        verifyConsensusForAccount ID:contractAddress
+    }
 }
