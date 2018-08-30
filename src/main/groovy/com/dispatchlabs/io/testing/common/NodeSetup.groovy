@@ -41,7 +41,7 @@ class NodeSetup {
         if(params.Regular) {
             returnNodes.Regulars = [:]
             params.Regular.times {
-                returnNodes.Regulars["Regular$it"] = [IsDelegate: false, IsSeed: false]
+                returnNodes.Regulars["Regular$it"] = [IsRegular:true,IsDelegate: false, IsSeed: false]
                 allNodes["Regular$it"] = returnNodes.Regulars["Regular$it"]
             }
         }
@@ -63,11 +63,14 @@ class NodeSetup {
         sleep(2000)
         if(directory.exists()){
             directory.deleteDir()
+            //assert directory.exists() == false,"Error, unable to delete directory: ${directory}"
             directory.mkdirs()
         }
 
+
         def allDelegates = []
         def allSeeds = []
+        def seedAddresses = []
         //find all delegates and create a list of them
         nodeSetup.each { nodeID, setup ->
             setup.IP = thisIP
@@ -75,7 +78,7 @@ class NodeSetup {
             setup.GrpcPort = lastPort+1
             lastPort = lastPort+2
             //if(setup.IsDelegate == true) allDelegates << [host:"127.0.0.1",port:setup.GrpcPort]
-            if(setup.IsSeed == true) allSeeds << [host:"127.0.0.1",port:setup.GrpcPort]
+            //if(setup.IsSeed == true) allSeeds << [host:"127.0.0.1",port:setup.GrpcPort]
         }
 
         def createNodeConfig = {nodeID,setup->
@@ -90,17 +93,20 @@ class NodeSetup {
                 ],
                 "grpcTimeout": 5,
                 "useQuantumEntropy": false,
-                "seedEndpoints": allSeeds,
+                "seeds": allSeeds,
                 //delegates:[],
+                isBookkeeper:true,
                 "genesisTransaction":genTransaction
         ]
-//            if(setup.IsSeed){
-//                config."delegates" = allDelegates
+//            if(setup.IsDelegate){
+//                config."seedAddresses" = seedAddresses
 //            }
             config = JsonOutput.toJson(config)
+            setup.config = config
             def basePath = directory.getAbsolutePath()+"/"+nodeID
             new File(basePath).mkdir()
             new File(basePath+"/config").mkdir()
+            setup.configDir = new File(basePath+"/config").absolutePath
             new File(basePath+"/config/config.json").write config
             def exeName = "disgo"
             if(System.getProperty("os.name").toLowerCase().contains("win")){
@@ -113,11 +119,11 @@ class NodeSetup {
                     .redirectErrorStream(true).start()
             }
             setup.disgoProc = setup.startProcess()
+            //sleep(2000)
         }
-        nodeSetup.each{nodeID,setup->
-            createNodeConfig(nodeID,setup)
-            //if(setup.IsDelegate) createNodeConfig(nodeID,setup)
-        }
+//        nodeSetup.each{nodeID,setup->
+//            if(setup.IsDelegate) createNodeConfig(nodeID,setup)
+//        }
 
         def getAddress = { nodeID, setup ->
             def basePath = directory.getAbsolutePath()+"/"+nodeID
@@ -137,19 +143,43 @@ class NodeSetup {
             assert false,"Error unable to get address from: ${nodeID} in 10 seconds"
         }
 
-        nodeSetup.each { nodeID, setup ->
-            getAddress(nodeID,setup)
-//            if(setup.IsDelegate) {
-//                getAddress(nodeID,setup)
-//                allDelegates << [endpoint:[host:"127.0.0.1",port:setup.GrpcPort],type:"Delegate",address:setup.address]
-//            }
+        nodeSetup.each{nodeID,setup->
+            if(setup.IsSeed) {
+                createNodeConfig(nodeID,setup)
+                getAddress(nodeID,setup)
+                allSeeds << [type:"Seed",grpcEndpoint:[host:"127.0.0.1",port:setup.GrpcPort],httpEndpoint:[host:"127.0.0.1",port:setup.HttpPort],address:setup.address]
+                //seedAddresses << setup.address
+            }
         }
-//
-//        nodeSetup.each{nodeID,setup->
-//            if(setup.IsSeed) {
-//                createNodeConfig(nodeID,setup)
-//                getAddress(nodeID,setup)
-//            }
-//        }
+        nodeSetup.each { nodeID, setup ->
+            if(setup.IsDelegate || setup.IsRegular) {
+                createNodeConfig(nodeID,setup)
+                getAddress(nodeID,setup)
+                //if(setup.IsDelegate) allDelegates << [type:"Delegate",grpcEndpoint:[host:"127.0.0.1",port:setup.GrpcPort],httpEndpoint:[host:"127.0.0.1",port:setup.HttpPort],address:setup.address]
+                if(setup.IsDelegate) allDelegates << setup.address
+            }
+        }
+        lastPort = 0
+
+        nodeSetup.each{nodeID,setup->
+            if(setup.IsSeed) {
+                def config = new JsonSlurper().parseText(new File(setup.configDir+"/config.json").text)
+                config.delegateAddresses = allDelegates
+                new File(setup.configDir+"/config.json").write JsonOutput.toJson(config)
+                setup.disgoProc.destroy()
+                //sleep(1000)
+                setup.disgoProc = setup.startProcess()
+                //sleep(2000)
+            }
+        }
+
+        nodeSetup.each { nodeID, setup ->
+            if(setup.IsDelegate || setup.IsRegular) {
+                setup.disgoProc.destroy()
+                setup.disgoProc = setup.startProcess()
+                sleep(2000)
+            }
+        }
+
     }
 }

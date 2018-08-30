@@ -16,7 +16,7 @@ class RegressionSmartContracts {
     @BeforeMethod(alwaysRun = true)
     public void baseState(){
         //create and start all needed nodes for each test
-        allNodes = NodeSetup.quickSetup Delegate: 4,Seed: 1,Regular: 0
+        allNodes = NodeSetup.quickSetup Delegate: 5,Seed: 1,Regular: 0
     }
 
     @Test(description="Deploy contract",groups = ["smoke", "smart contract"])
@@ -195,7 +195,7 @@ class RegressionSmartContracts {
         def contractAddress = response.then().extract().path("data.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
-                Method: "setVar5",Params: ["value":"5555"],Status: "JSON_PARSE_ERROR: value for field 'params' must be an array"
+                Method: "setVar5",Params: ["value":"5555"],Status: "StatusJsonParseError: value for field 'params' must be an array"
     }
 
     @Test(description="Pass invalid value for parameter type: integer",groups = ["smart contract"])
@@ -206,19 +206,20 @@ class RegressionSmartContracts {
         def contractAddress = response.then().extract().path("data.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
-                Method: "setVar5",Params: 5555,Status: "JSON_PARSE_ERROR: value for field 'params' must be an array"
+                Method: "setVar5",Params: 5555,Status: "StatusJsonParseError: value for field 'params' must be an array"
     }
 
     @Test(description="Pass invalid value for parameter type: boolean",groups = ["smart contract"])
     public void SmartContract_API24(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
-                Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
+                Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
         def contractAddress = response.then().extract().path("data.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
-                ABI: DefaultSampleContract.defaultSampleABI,
-                Method: "boolParamType",Params: ["testStr"]
-        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "InternalError", Timeout: 10
+                ABI: ComplexContract.abi,
+                Method: "boolParamType",Params: ["testStr"],
+                Status: "StatusJsonParseError: Invalid value provided for method boolParamType: boolean value required, provided value is testStr"
+        //waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "InternalError", Timeout: 10
     }
 
     @Test(description="Contract returns no value",groups = ["smart contract"])
@@ -237,15 +238,15 @@ class RegressionSmartContracts {
     @Test(description="Negative: Pass only some parameter values for methods",groups = ["smart contract"])
     public void SmartContract_API28(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
-                Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
+                Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
         def contractAddress = response.then().extract().path("data.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
-                ABI: DefaultSampleContract.defaultSampleABI,
-                Method: "multiParams",Params: ["sdfsdf"]
-        def getID = response.Hash
-        waitForTransactionStatus ID:getID,Node:allNodes.Delegates.Delegate0, DataStatus: "InternalError", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,DataStatus: "InternalError",humanReadableStatus: "argument count mismatch: 1 for 2")
+                ABI: ComplexContract.abi,
+                Method: "multiParams",Params: ["sdfsdf"],
+                Status: "StatusJsonParseError: This method multiParams, requires 2 parameters and 1 are provided"
+        //def getID = response.Hash
+        //waitForTransactionStatus ID:getID,Node:allNodes.Delegates.Delegate0, Status: "NotFound", Timeout: 10
     }
 
     @Test(description="Deploy exact same contract",groups = ["smart contract"])
@@ -281,7 +282,7 @@ class RegressionSmartContracts {
         def contractAddress = response.then().extract().path("data.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: "",
-                Method: "setVar5",Params: ["10"],Status: "JSON_PARSE_ERROR: value for field 'abi' is invalid"
+                Method: "setVar5",Params: ["10"],Status: "StatusJsonParseError: value for field 'abi' is invalid"
     }
 
     @Test(description="Negative: Invalid values for ABI",groups = ["smart contract"])
@@ -292,16 +293,29 @@ class RegressionSmartContracts {
         def contractAddress = response.then().extract().path("data.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: "aaaaadddddsdfsdfsfsdffffffffffffffffffffffffff",
-                Method: "setVar5",Params: ["10"]
-        def getID = response.Hash
-        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "InternalError", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,DataStatus: "InternalError",HumanReadable: '''invalid character 'ª' looking for beginning of value''')
+                Method: "setVar5",Params: ["10"],
+                Status: "StatusJsonParseError: The ABI provided is not a valid ABI structure"
+    }
+
+    @Test(description="Negative: Invalid values for ABI on deploy",groups = ["smart contract"])
+    public void SmartContract_API32_b(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
+                Code:DefaultSampleContract.defaultSample,ABI: "aaaaadddddsdfsdfsfsdffffffffffffffffffffffffff"
+        response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        //def contractAddress = response.then().extract().path("data.contractAddress")
+        //response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+        //        ABI: "aaaaadddddsdfsdfsfsdffffffffffffffffffffffffff",
+        //        Method: "setVar5",Params: ["10"],
+        //        Status: "StatusJsonParseError: value for field 'abi' is invalid"
+        //def getID = response.Hash
+        //waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "InternalError", Timeout: 10
+        //verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,DataStatus: "InternalError",HumanReadable: '''invalid character 'ª' looking for beginning of value''')
     }
 
     @Test(description="Negative: Empty smart contract",groups = ["smart contract"])
     public void SmartContract_API35(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
-                Code:"",ABI: DefaultSampleContract.defaultSampleABI,Status: "JSON_PARSE_ERROR: value for field 'to' is invalid"
+                Code:"",ABI: DefaultSampleContract.defaultSampleABI,Status: "InvalidTransaction"
     }
 
     @Test(description="Negative: Partial bytecode of valid contract",groups = ["smart contract"])
@@ -310,7 +324,7 @@ class RegressionSmartContracts {
                 ABI: DefaultSampleContract.defaultSampleABI,
                 Code:"60806040523480156100105760"//DefaultSampleContract.defaultSample.substring(0,DefaultSampleContract.defaultSample.size()-10)
         def getID = response.Hash
-        response = waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "InvalidTransaction", Timeout: 10
+        response = waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "InternalError", Timeout: 10
     }
 
     @Test(description="Contract returns multiple values (2 strings)",groups = ["smart contract"])
@@ -363,10 +377,8 @@ class RegressionSmartContracts {
         def contractAddress1 = response.then().extract().path("data.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress1, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
-                Method: "setVar5",Params: ["asfsf","asfsfsdfsdf"]
-        def getID = response.Hash
-        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "InternalError", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,DataStatus: "InternalError",HumanReadable: "argument count mismatch: 2 for 1")
+                Method: "setVar5",Params: ["asfsf","asfsfsdfsdf"],
+                Status: "StatusJsonParseError: This method setVar5, requires 1 parameters and 2 are provided"
     }
 
     @Test(description="Negative: Smart contract method throws an exception",groups = ["smart contract"])
@@ -380,7 +392,7 @@ class RegressionSmartContracts {
                 Method: "throwException",Params: []
         def getID = response.Hash
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["aaaaaaaaaaaaa"])
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,DataStatus:"InternalError",HumanReadable:"invalid opcode 0xfe")
     }
 
     @Test(description="Negative buffer overflow test with integer",groups = ["smart contract"])
@@ -395,5 +407,15 @@ class RegressionSmartContracts {
         def getID = response.Hash
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, Status: "Ok", Timeout: 10
         verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,humanReadableStatus:"abi: cannot use float64 as type ptr as argument")
+    }
+
+    @Test(description="Deploy contract",groups = ["smart contract"])
+    public void SmartContract_API1111(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
+                Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
+        response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        def contractAddress = response.then().extract().path("data.contractAddress")
+        println(contractAddress)
+        verifyConsensusForAccount ID:contractAddress
     }
 }
