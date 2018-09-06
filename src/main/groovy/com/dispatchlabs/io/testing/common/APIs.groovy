@@ -64,7 +64,7 @@ class APIs {
         byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(to));
         byteArrayOutputStream.write(Utils.longToBytes(value));
         byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(code));
-        byteArrayOutputStream.write(abi.getBytes("UTF-8"));
+        //byteArrayOutputStream.write(abi.getBytes("UTF-8"));
         byteArrayOutputStream.write(method.getBytes("UTF-8"));
         //byteArrayOutputStream.write(code.getBytes());
         byteArrayOutputStream.write(Utils.longToBytes(time));
