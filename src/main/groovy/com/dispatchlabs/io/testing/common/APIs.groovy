@@ -158,7 +158,7 @@ class APIs {
         while (timeout>0){
             RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
             request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
-            Response response = request.get("/v1/receipts/"+params.ID)
+            Response response = request.get("/v1/transactions/"+params.ID)
             response.then().log().all()
             if(params.StatusCode){
                 assert response.getStatusCode() == params.StatusCode
@@ -166,7 +166,7 @@ class APIs {
             if(params.DataStatus){
                 status = params.DataStatus
                 if (response.then().extract().path("data") != null){
-                    if(response.then().extract().path("data.status") == params.DataStatus) return response
+                    if(response.then().extract().path("data.receipt.status") == params.DataStatus) return response
                 }
             }
             else{
@@ -293,6 +293,24 @@ class APIs {
         RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
         request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
         Response response = request.get("/v1/accounts?page=$params.Page")
+        response.then().log().all()
+        return response.then().statusCode(200).extract().path("data")
+    }
+
+    public static getTransactionsFrom(def params){
+        sleep(10000)
+        RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
+        request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
+        Response response = request.get("/v1/transactions?from=${params.From}&page=${params.Page}")
+        response.then().log().all()
+        return response.then().statusCode(200).extract().path("data")
+    }
+
+    public static getTransactionsTo(def params){
+        sleep(10000)
+        RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
+        request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
+        Response response = request.get("/v1/transactions?to=${params.To}&page=${params.Page}")
         response.then().log().all()
         return response.then().statusCode(200).extract().path("data")
     }
