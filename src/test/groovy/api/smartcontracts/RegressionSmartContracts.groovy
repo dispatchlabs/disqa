@@ -24,7 +24,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
     }
 
     @Test(description="Get contract value",groups = ["smoke", "smart contract"])
@@ -32,7 +32,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
                 Method: "getVar5",Params: []
@@ -46,7 +46,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "returnInt",Params: []
@@ -60,7 +60,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "returnUint",Params: []
@@ -74,7 +74,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "returnAddress",Params: []
@@ -89,7 +89,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "returnBool",Params: []
@@ -104,7 +104,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "intParam",Params: [20]
@@ -118,7 +118,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "uintParam",Params: [20]
@@ -133,7 +133,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "boolParamType",Params: [true]
@@ -147,7 +147,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "arrayParam",Params: [[1,2]]
@@ -162,7 +162,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
                 Method: "setVar5",Params: ["5555"]
@@ -180,7 +180,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
                 Method: "setVar5",Params: [false]
@@ -192,7 +192,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
                 Method: "setVar5",Params: ["value":"5555"],Status: "StatusJsonParseError: value for field 'params' must be an array"
@@ -203,7 +203,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
                 Method: "setVar5",Params: 5555,Status: "StatusJsonParseError: value for field 'params' must be an array"
@@ -214,7 +214,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "boolParamType",Params: ["testStr"],
@@ -227,12 +227,12 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
                 Method: "setVar5",Params: ["10"]
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        response.then().assertThat().body("data.contractAddress",equalTo(contractAddress))
+        response.then().assertThat().body("data.receipt.contractAddress",equalTo(contractAddress))
     }
 
     @Test(description="Negative: Pass only some parameter values for methods",groups = ["smart contract"])
@@ -240,7 +240,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "multiParams",Params: ["sdfsdf"],
@@ -254,12 +254,12 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress1 = response.then().extract().path("data.contractAddress")
+        def contractAddress1 = response.then().extract().path("data.receipt.contractAddress")
 
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress2 = response.then().extract().path("data.contractAddress")
+        def contractAddress2 = response.then().extract().path("data.receipt.contractAddress")
 
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress1, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
@@ -279,7 +279,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: "",
                 Method: "setVar5",Params: ["10"],Status: "StatusJsonParseError: value for field 'abi' is invalid"
@@ -290,7 +290,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: "aaaaadddddsdfsdfsfsdffffffffffffffffffffffffff",
                 Method: "setVar5",Params: ["10"],
@@ -302,7 +302,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: "aaaaadddddsdfsdfsfsdffffffffffffffffffffffffff"
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        //def contractAddress = response.then().extract().path("data.contractAddress")
+        //def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         //response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
         //        ABI: "aaaaadddddsdfsdfsfsdffffffffffffffffffffffffff",
         //        Method: "setVar5",Params: ["10"],
@@ -332,7 +332,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:ComplexContract.contract,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress1 = response.then().extract().path("data.contractAddress")
+        def contractAddress1 = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress1, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "getMultiReturn",Params: []
@@ -346,7 +346,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:ComplexContract.contract,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress1 = response.then().extract().path("data.contractAddress")
+        def contractAddress1 = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress1, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "logEvent",Params: []
@@ -360,7 +360,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:ComplexContract.contract,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress1 = response.then().extract().path("data.contractAddress")
+        def contractAddress1 = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress1, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "notThere",Params: []
@@ -374,7 +374,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:ComplexContract.contract,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress1 = response.then().extract().path("data.contractAddress")
+        def contractAddress1 = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress1, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "setVar5",Params: ["asfsf","asfsfsdfsdf"],
@@ -386,7 +386,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:ComplexContract.contract,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "throwException",Params: []
@@ -400,7 +400,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "intParam",Params: [99999999999999999999999999999999999999999999999999999999999999999999999999999]
@@ -414,7 +414,7 @@ class RegressionSmartContracts {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         println(contractAddress)
         verifyConsensusForAccount ID:contractAddress
     }
