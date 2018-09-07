@@ -198,10 +198,10 @@ class APIs {
         params.Nodes.each{Node->
             RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
             request.baseUri("http://"+Node.IP+":"+Node.HttpPort)
-            Response response = request.get("/v1/receipts/"+params.ID)
+            Response response = request.get("/v1/transactions/"+params.ID)
             response.then().log().all()
             if(params.Status == "InternalError")
-                response.then().assertThat().body("data.status",equalTo(params.Status))
+                response.then().assertThat().body("data.receipt.status",equalTo(params.Status))
             else if(params.Status)
                 response.then().assertThat().body("status",equalTo(params.Status))
             if(params.Balance)
