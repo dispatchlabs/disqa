@@ -154,7 +154,7 @@ class RegressionTransactions {
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Time:time
 
         println("Sending same transaction again.")
-        sleep(10000)
+        sleep(1000)
         sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Time:time,Status: "DuplicateTransaction"
         sleep(2000)

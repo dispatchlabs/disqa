@@ -38,7 +38,7 @@ class TestNetSmokeTest {
     @BeforeClass
     public void findAllNodes(){
         RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
-        request.baseUri("http://35.230.56.85:1975")
+        request.baseUri("http://35.230.33.204:1975")
         Response response = request.get("/v1/delegates")
         response.then().log().all()
         def delegates = response.then().extract().path("data")
