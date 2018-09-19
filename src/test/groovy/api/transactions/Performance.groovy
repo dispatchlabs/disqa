@@ -55,7 +55,7 @@ public class PerfUser extends Thread  {
     public void run() {
         while (true){
             def requests = []
-            3000.times{
+            1000.times{
                 println it
                 def request = sendTransaction Node:node, Value:1, PrivateKey:"Genesis",
                         To:node.address ,From: "Genesis",Log: false,ReturnRequest:true

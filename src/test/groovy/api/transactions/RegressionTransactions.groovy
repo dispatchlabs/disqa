@@ -202,7 +202,7 @@ class RegressionTransactions {
     @Test(description="Negative: Time value 1 year in the future",groups = ["transactions"])
     public void transactions_API67(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:999, PrivateKey:"Genesis",
-                To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis",Time: System.currentTimeMillis()+30000000000
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 999
 
@@ -383,12 +383,12 @@ class RegressionTransactions {
         def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:1, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
+        def time = System.currentTimeMillis()
 
         def request1 = sendTransaction Node:allNodes.Delegates.Delegate1, Value:1, PrivateKey:allNodes.Delegates.Delegate1.privateKey,
-                To:allNodes.Delegates.Delegate0.address ,From: allNodes.Delegates.Delegate1.address,ReturnRequest:true
-        sleep(1)
+                To:allNodes.Delegates.Delegate0.address ,From: allNodes.Delegates.Delegate1.address,ReturnRequest:true,Time:time
         def request2 = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
-                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,ReturnRequest:true
+                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,ReturnRequest:true,Time:time+100
 
         request2.post("/v1/transactions")
         sleep(200)
@@ -559,7 +559,7 @@ class RegressionTransactions {
     @Test(description="Test transaction pagination",groups = ["transactions"])
     public void transactions_API131(){
         def transactions = []
-        101.times{
+        11.times{
             def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
                     To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
             transactions.add(0,response.Hash)
@@ -568,12 +568,12 @@ class RegressionTransactions {
         }
         sleep(10000)
         def transactionsGet = getTransactions(Node:allNodes.Delegates.Delegate0,Page: 1)
-        assert transactionsGet.size() == 100
+        assert transactionsGet.size() == 10
         transactionsGet.eachWithIndex {trans,index->
             assert trans.hash == transactions[index]
         }
         transactionsGet = getTransactions(Node:allNodes.Delegates.Delegate0,Page: 2)
-        assert transactionsGet.size() == 10
+        assert transactionsGet.size() == 1
         assert transactionsGet[0].hash == transactions[10]
     }
 
@@ -627,12 +627,14 @@ class RegressionTransactions {
     @Test(description="Shut down 2 nodes, verify gossip",groups = ["transactions"])
     public void transactions_API137(){
         println allNodes.Delegates.Delegate3.disgoProc.destroy()
-        println allNodes.Delegates.Delegate4.disgoProc.destroy()
+        //println allNodes.Delegates.Delegate4.disgoProc.destroy()
         sleep(15000)
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 140
         def transaction = getTransaction(Node:allNodes.Delegates.Delegate0,Hash:response.Hash)
+        println allNodes.Delegates.Delegate3.address
+        println allNodes.Delegates.Delegate4.address
         assert transaction.gossip.size() == 3,"Error expected 3 gossip entries, got ${transaction.gossip.size()}"
         def expectedDelegates = [allNodes.Delegates.Delegate0,allNodes.Delegates.Delegate1,allNodes.Delegates.Delegate2]
         transaction.gossip.each{gossipEntry->
@@ -671,17 +673,19 @@ class RegressionTransactions {
         allNodes.Delegates.Delegate2.disgoProc.destroy()
         allNodes.Delegates.Delegate3.disgoProc.destroy()
         allNodes.Delegates.Delegate4.disgoProc.destroy()
-        sleep(10000)
+        sleep(20000)
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
-        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "InvalidTransaction", Timeout: 40
+        sleep(10000)
+        def transaction = getTransaction(Node:allNodes.Delegates.Delegate0,Hash: response.Hash)
+        assert transaction.receipt.status == "","Error: transactions should have status of empty string."
     }
 
 
     @Test(description="Test pagination of transactions from",groups = ["transactions"])
     public void transactions_API143(){
         def transactions = []
-        101.times {
+        11.times {
             def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
                     To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
             transactions.add(0,response.Hash)
@@ -689,7 +693,7 @@ class RegressionTransactions {
         }
         sleep(10000)
         def transactionsFrom = getTransactionsFrom(Node:allNodes.Delegates.Delegate0,From:NodeSetup.genAddress,Page: 1)
-        assert transactionsFrom.size() == 100
+        assert transactionsFrom.size() == 10
         transactionsFrom.eachWithIndex {trans,index->
             assert trans.hash == transactions[index]
         }
@@ -702,7 +706,7 @@ class RegressionTransactions {
     @Test(description="Test pagination of transactions to",groups = ["transactions"])
     public void transactions_API144(){
         def transactions = []
-        101.times {
+        11.times {
             def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
                     To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
             transactions.add(0,response.Hash)
@@ -710,7 +714,7 @@ class RegressionTransactions {
         }
         sleep(10000)
         def transactionsTo = getTransactionsTo(Node:allNodes.Delegates.Delegate0,To:allNodes.Delegates.Delegate0.address,Page: 1)
-        assert transactionsTo.size() == 100
+        assert transactionsTo.size() == 10
         transactionsTo.eachWithIndex {trans,index->
             assert trans.hash == transactions[index]
         }
@@ -718,6 +722,22 @@ class RegressionTransactions {
         assert transactionsTo.size() == 1
         assert transactionsTo[0].hash == transactions[10]
 
+    }
+
+    @Test(description="Test pagination options of transactions",groups = ["transactions"])
+    public void transactions_API145(){
+        def transactions = []
+        11.times {
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
+                    To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+            transactions.add(0,response.Hash)
+            sleep(1)
+        }
+        sleep(10000)
+        def transactionsGet = getTransactions(Node:allNodes.Delegates.Delegate0,From:NodeSetup.genAddress,Page: 1,PageSize: 4)
+        assert transactionsGet.size() == 4
+        transactionsGet = getTransactions(Node:allNodes.Delegates.Delegate0,From:NodeSetup.genAddress,Page: 2,PageSize: 5)
+        assert transactionsGet.size() == 5
     }
 
     /*
