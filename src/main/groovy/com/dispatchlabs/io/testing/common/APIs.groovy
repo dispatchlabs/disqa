@@ -284,7 +284,28 @@ class APIs {
     public static def getTransactions(def params){
         RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
         request.baseUri("http://"+params.Node.IP+":"+params.Node.HttpPort)
-        Response response = request.get("/v1/transactions?page=$params.Page")
+        def pageArguments = ""
+        if(params.Page){
+            pageArguments = "?page=$params.Page"
+        }
+        if(params.PageStart){
+            if(pageArguments == ""){
+                pageArguments = pageArguments+"?pageStart=$params.PageStart"
+            }
+            else{
+                pageArguments = pageArguments+"&pageStart=$params.PageStart"
+            }
+        }
+        if(params.PageSize){
+            if(pageArguments == ""){
+                pageArguments = pageArguments+"?pageSize=$params.PageSize"
+            }
+            else{
+                pageArguments = pageArguments+"&pageSize=$params.PageSize"
+            }
+
+        }
+        Response response = request.get("/v1/transactions$pageArguments")
         response.then().log().all()
         return response.then().statusCode(200).extract().path("data")
     }
