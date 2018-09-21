@@ -80,7 +80,7 @@ class RegressionSmartContracts {
                 Method: "returnAddress",Params: []
         def getID = response.Hash
         response = waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def returnedAddress = response.then().extract().path("data.contractResult")
+        def returnedAddress = response.then().extract().path("data.receipt.contractResult")
         assert returnedAddress[0].size() == 20,"Error: address size should be 20."
     }
 
@@ -105,6 +105,7 @@ class RegressionSmartContracts {
                 Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
         def contractAddress = response.then().extract().path("data.receipt.contractAddress")
+        println(contractAddress)
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
                 Method: "intParam",Params: [20]
@@ -173,6 +174,39 @@ class RegressionSmartContracts {
         def getID = response.Hash
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
         verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["5555"])
+    }
+
+    @Test(description="Set contract value through multiple delegates",groups = ["smart contract"])
+    public void SmartContract_API3_b(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
+                Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
+        response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
+
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+                ABI: DefaultSampleContract.defaultSampleABI,
+                Method: "setVar5",Params: ["000"]
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1, DataStatus: "Ok", Timeout: 10
+        response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+                ABI: DefaultSampleContract.defaultSampleABI,
+                Method: "setVar5",Params: ["111"]
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2, DataStatus: "Ok", Timeout: 10
+        response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+                ABI: DefaultSampleContract.defaultSampleABI,
+                Method: "setVar5",Params: ["222"]
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        response = sendTransaction Node:allNodes.Delegates.Delegate3, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+                ABI: DefaultSampleContract.defaultSampleABI,
+                Method: "setVar5",Params: ["333"]
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+
+
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+                ABI: DefaultSampleContract.defaultSampleABI,
+                Method: "getVar5",Params: []
+        def getID = response.Hash
+        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["333"])
     }
 
     @Test(description="Negative: Pass invalid value for parameter type: string",groups = ["smart contract"])
@@ -282,19 +316,25 @@ class RegressionSmartContracts {
         def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: "",
-                Method: "setVar5",Params: ["10"],Status: "StatusJsonParseError: value for field 'abi' is invalid"
+                Method: "setVar5",Params: ["10"]//,Status: "StatusJsonParseError: value for field 'abi' is invalid"
     }
 
-    @Test(description="Negative: Invalid values for ABI",groups = ["smart contract"])
+    @Test(description="Negative: Invalid values for ABI on execute",groups = ["smart contract"])
     public void SmartContract_API32(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
         def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
-                ABI: "aaaaadddddsdfsdfsfsdffffffffffffffffffffffffff",
-                Method: "setVar5",Params: ["10"],
-                Status: "StatusJsonParseError: The ABI provided is not a valid ABI structure"
+                ABI: "asldfkjdslkfhkjldshafdkjshf",
+                Method: "setVar5",Params: ["5555"]
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+                ABI: "lfksajdlkfsdjfksjdhflaksdfhjs",
+                Method: "getVar5",Params: []
+        def getID = response.Hash
+        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["5555"])
     }
 
     @Test(description="Negative: Invalid values for ABI on deploy",groups = ["smart contract"])
@@ -330,7 +370,7 @@ class RegressionSmartContracts {
     @Test(description="Contract returns multiple values (2 strings)",groups = ["smart contract"])
     public void SmartContract_API106(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
-                Code:ComplexContract.contract,ABI: DefaultSampleContract.defaultSampleABI
+                Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
         def contractAddress1 = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress1, PrivateKey:"Genesis",Type:2,
@@ -344,7 +384,7 @@ class RegressionSmartContracts {
     @Test(description="Contract method does logging (emit the event)",groups = ["smart contract"])
     public void SmartContract_API108(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
-                Code:ComplexContract.contract,ABI: DefaultSampleContract.defaultSampleABI
+                Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
         def contractAddress1 = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress1, PrivateKey:"Genesis",Type:2,
@@ -358,15 +398,16 @@ class RegressionSmartContracts {
     @Test(description="Negative: Call out method which does not exist",groups = ["smart contract"])
     public void SmartContract_API107(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
-                Code:ComplexContract.contract,ABI: DefaultSampleContract.defaultSampleABI
+                Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
         def contractAddress1 = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress1, PrivateKey:"Genesis",Type:2,
                 ABI: ComplexContract.abi,
-                Method: "notThere",Params: []
+                Method: "notThere",Params: [],
+                Status: "StatusJsonParseError: This method notThere is not valid for this contract"
         def getID = response.Hash
-        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "InternalError", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,DataStatus:"InternalError",HumanReadable:"method 'notThere' not found")
+        //waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "InternalError", Timeout: 10
+        //verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,DataStatus:"InternalError",HumanReadable:"method 'notThere' not found")
     }
 
     @Test(description="Negative: Pass more parameters for a method than it has",groups = ["smart contract"])
@@ -384,7 +425,7 @@ class RegressionSmartContracts {
     @Test(description="Negative: Smart contract method throws an exception",groups = ["smart contract"])
     public void SmartContract_API116(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
-                Code:ComplexContract.contract,ABI: DefaultSampleContract.defaultSampleABI
+                Code:ComplexContract.contract,ABI: ComplexContract.abi
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
         def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,

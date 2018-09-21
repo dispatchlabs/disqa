@@ -38,7 +38,7 @@ class TestNetSmokeTest {
     @BeforeClass
     public void findAllNodes(){
         RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
-        request.baseUri("http://35.230.33.204:1975")
+        request.baseUri("http://127.0.0.1:3500")
         Response response = request.get("/v1/delegates")
         response.then().log().all()
         def delegates = response.then().extract().path("data")
@@ -102,7 +102,7 @@ class TestNetSmokeTest {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
                 Method: "getVar5",Params: []

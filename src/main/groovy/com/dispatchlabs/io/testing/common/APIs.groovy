@@ -207,9 +207,9 @@ class APIs {
             if(params.Balance)
                 response.then().assertThat().body("data.balance",equalTo(params.Balance))
             if(params.ContractResult)
-                response.then().assertThat().body("data.contractResult",equalTo(params.ContractResult))
+                response.then().assertThat().body("data.receipt.contractResult",equalTo(params.ContractResult))
             if(params.HumanReadable)
-                response.then().assertThat().body("data.humanReadableStatus",equalTo(params.HumanReadable))
+                response.then().assertThat().body("data.receipt.humanReadableStatus",equalTo(params.HumanReadable))
         }
     }
 
