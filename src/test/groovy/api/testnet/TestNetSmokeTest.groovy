@@ -1,5 +1,6 @@
 package api.testnet
 
+import com.dispatchlabs.io.testing.common.contracts.ComplexContract
 import com.dispatchlabs.io.testing.common.contracts.DefaultSampleContract
 import com.jayway.restassured.RestAssured
 import com.jayway.restassured.http.ContentType
@@ -38,7 +39,7 @@ class TestNetSmokeTest {
     @BeforeClass
     public void findAllNodes(){
         RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
-        request.baseUri("http://127.0.0.1:3500")
+        request.baseUri("http://35.227.158.201:1975")
         Response response = request.get("/v1/delegates")
         response.then().log().all()
         def delegates = response.then().extract().path("data")
@@ -116,7 +117,7 @@ class TestNetSmokeTest {
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
         response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.contractAddress")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
         response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
                 ABI: DefaultSampleContract.defaultSampleABI,
                 Method: "setVar5",Params: ["5555"]
@@ -127,6 +128,22 @@ class TestNetSmokeTest {
         def getID = response.Hash
         waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
         verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["5555"])
+    }
+
+    @Test(description="Denis test",groups = ["test net"])
+    public void SmartContract_TESTNET_DenisDebug(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
+                Code:ComplexContract.contract,ABI: ComplexContract.abi
+        response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
+        println(contractAddress)
+        //sleep(10000)
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
+                ABI: ComplexContract.abi,
+                Method: "intParam",Params: [20]
+        def getID = response.Hash
+        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["test"])
     }
 
 }
