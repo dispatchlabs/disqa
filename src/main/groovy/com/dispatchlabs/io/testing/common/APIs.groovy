@@ -10,6 +10,8 @@ import org.bouncycastle.util.encoders.Hex
 
 import javax.xml.bind.DatatypeConverter
 
+import static org.hamcrest.Matchers.contains
+import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasItem
 
@@ -117,7 +119,8 @@ class APIs {
 
         //Verify response (optional)
         if(params.Status)
-            response.then().assertThat().body("status",equalTo(params.Status))
+
+            response.then().assertThat().body("status",containsString(params.Status))
         if(params.StatusCode){
             assert response.getStatusCode() == params.StatusCode
         }
