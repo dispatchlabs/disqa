@@ -1,6 +1,5 @@
 package api.testnet
 
-import com.dispatchlabs.io.testing.common.contracts.ComplexContract
 import com.dispatchlabs.io.testing.common.contracts.DefaultSampleContract
 import com.jayway.restassured.RestAssured
 import com.jayway.restassured.http.ContentType
@@ -39,7 +38,7 @@ class TestNetSmokeTest {
     @BeforeClass
     public void findAllNodes(){
         RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
-        request.baseUri("http://35.227.158.201:1975")
+        request.baseUri("http://35.197.78.109:1975")
         Response response = request.get("/v1/delegates")
         response.then().log().all()
         def delegates = response.then().extract().path("data")
@@ -132,18 +131,19 @@ class TestNetSmokeTest {
 
     @Test(description="Denis test",groups = ["test net"])
     public void SmartContract_TESTNET_DenisDebug(){
-        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
-                Code:ComplexContract.contract,ABI: ComplexContract.abi
-        response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
-        println(contractAddress)
-        //sleep(10000)
-        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:contractAddress, PrivateKey:"Genesis",Type:2,
-                ABI: ComplexContract.abi,
-                Method: "intParam",Params: [20]
-        def getID = response.Hash
-        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
-        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["test"])
+        def wallet1 = createWallet()
+        println("Private key 1: "+wallet1.PrivateKey)
+        def wallet2 = createWallet()
+        println("Private key 2: "+wallet2.PrivateKey)
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:999, PrivateKey:"Genesis",
+                To:wallet1.Address ,From: "Genesis"
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:wallet1.Address,Status: "Ok", Balance: 999
+        response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:500, PrivateKey:"Genesis",
+                To:wallet2.Address ,From: "Genesis"
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:wallet2.Address,Status: "Ok", Balance: 500
+
     }
 
 }
