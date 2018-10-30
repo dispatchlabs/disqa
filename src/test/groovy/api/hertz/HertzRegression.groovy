@@ -31,7 +31,7 @@ class HertzRegression {
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
     }
 
-    @Test(description="Deploy contract",groups = ["smoke", "smart contract"])
+    @Test(description="Deploy contract",groups = ["smart contract"])
     public void Hertz_API111111(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:"Genesis",To:"", PrivateKey:"Genesis",Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
@@ -39,7 +39,7 @@ class HertzRegression {
         def contractAddress = response.then().extract().path("data.receipt.contractAddress")
     }
 
-    @Test(description="Get contract value",groups = ["smoke", "smart contract"])
+    @Test(description="Get contract value",groups = ["smart contract"])
     public void SmartContract_API2(){
         def wallet1 = createWallet()
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:0,From:wallet1.Address,To:"", PrivateKey:"Genesis",Type:1,
