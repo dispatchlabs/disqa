@@ -38,7 +38,8 @@ class TestNetSmokeTest {
     @BeforeClass
     public void findAllNodes(){
         RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
-        request.baseUri("http://35.197.78.109:1975")
+        //request.baseUri("http://35.197.78.109:1975")
+        request.baseUri("http://127.0.0.1:3502")
         Response response = request.get("/v1/delegates")
         response.then().log().all()
         def delegates = response.then().extract().path("data")
@@ -58,7 +59,7 @@ class TestNetSmokeTest {
         def balance = 0
         allNodes.Delegates.each{key,delegate->
             balance++
-            def response = sendTransaction Node:delegate, Value:1, PrivateKey:"Genesis",
+            def response = sendTransaction Node:delegate, Value:"1", PrivateKey:"Genesis",
                     To:wallet1.Address ,From: "Genesis"
             waitForTransactionStatus ID:response.Hash ,Node:delegate, DataStatus: "Ok", Timeout: 10
         }

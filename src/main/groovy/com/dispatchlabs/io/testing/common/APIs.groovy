@@ -10,10 +10,7 @@ import org.bouncycastle.util.encoders.Hex
 
 import javax.xml.bind.DatatypeConverter
 
-import static org.hamcrest.Matchers.contains
-import static org.hamcrest.Matchers.containsString
-import static org.hamcrest.Matchers.equalTo
-import static org.hamcrest.Matchers.hasItem
+import static org.hamcrest.Matchers.*
 
 class APIs {
 
@@ -34,9 +31,10 @@ class APIs {
             from = params.From
 
         String to = params.To
-        long value = params.Value
+        //long value = params.Value
         //BigInteger value = params.Value
         //double value = params.Value
+        String value = ""
         long time
         if(params.Time!=null)
             time = params.Time
@@ -57,14 +55,16 @@ class APIs {
         if(params.Code != "" && params.Code != null) code = params.Code
         if(params.Method != "" && params.Method != null) method = params.Method
         if(params.ABI != "" && params.ABI != null) abi = params.ABI
+        if(params.Value != "" && params.Value != null) value = params.Value
         if(params.Params != null) paramsToContract = params.Params
-        if(params.Hertz != 0 && params.Hertz != null) hertz = params.Hertz
+        //if(params.Hertz != 0 && params.Hertz != null) hertz = params.Hertz
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream( );
         byteArrayOutputStream.write(type);
         byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(from));
         byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(to));
-        byteArrayOutputStream.write(Utils.longToBytes(value));
+        //byteArrayOutputStream.write(Utils.longToBytes(value));
+        byteArrayOutputStream.write(value.getBytes("UTF-8"));
         byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(code));
         //byteArrayOutputStream.write(abi.getBytes("UTF-8"));
         byteArrayOutputStream.write(method.getBytes("UTF-8"));
@@ -99,7 +99,7 @@ class APIs {
                 params:paramsToContract,
                 abi:abi,
                 method:method,
-                hertz:hertz,
+                //hertz:hertz,
                 fromName:"",
                 toName:""
         ]
@@ -191,6 +191,8 @@ class APIs {
             response.then().log().all()
             if(params.Status)
                 response.then().assertThat().body("status",equalTo(params.Status))
+            if(params.Hertz)
+                response.then().assertThat().body("data.hertzAvailable",equalTo(params.Hertz))
             if(params.Balance)
                 response.then().assertThat().body("data.balance",equalTo(params.Balance))
         }
