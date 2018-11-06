@@ -54,74 +54,74 @@ class RegressionTransactions {
     public void transactions_API102(){
         def newAccount = Utils.createAccount()
 
-        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:999, PrivateKey:"Genesis",
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"999", PrivateKey:"Genesis",
                 To:newAccount.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:newAccount.address,Status: "Ok", Balance: 999
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:newAccount.address,Status: "Ok", Balance: "999"
     }
 
     @Test(description="Delegate to delegate: 999 token transfer",groups = ["smoke", "transactions"])
     public void transactions_API51(){
-        def response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:999, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        def response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:"999", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,DataStatus: "Ok", Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 1000999
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 999001
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "1000999"
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "999001"
     }
 
     @Test(description="All delegate tokens transferred",groups = ["transactions"])
     public void transactions_API103(){
-        def response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:1000000, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        def response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:"1000000", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,DataStatus: "Ok", Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 2000000
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 0
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "2000000"
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "0"
     }
 
     @Test(description="Transfer zero tokens",groups = ["transactions"])
     public void transactions_API96(){
-        sendTransaction Node:allNodes.Delegates.Delegate2, Value:0, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        sendTransaction Node:allNodes.Delegates.Delegate2, Value:"0", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,Status:"InvalidTransaction"
         //waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,DataStatus: "Ok", Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 1000000
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 1000000
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "1000000"
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "1000000"
     }
 
     @Test(description="Negative: Transfer more than available tokens in the wallet",groups = ["transactions"])
     public void transactions_API84(){
-        def response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:1000001, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        def response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:"1000001", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,DataStatus: "InsufficientTokens", Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 1000000
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 1000000
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "1000000"
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "1000000"
     }
 
     @Test(description="Transfer tokens from one delegate to another and then back again",groups = ["smoke", "transactions"])
     public void transactions_API104(){
-        def response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:500, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        def response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:"500", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,DataStatus: "Ok", Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 1000500
-        response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:1000500, PrivateKey:allNodes.Delegates.Delegate1.privateKey,
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "1000500"
+        response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:"1000500", PrivateKey:allNodes.Delegates.Delegate1.privateKey,
                 To:allNodes.Delegates.Delegate0.address ,From: allNodes.Delegates.Delegate1.address
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,DataStatus: "Ok", Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 0
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 2000000
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "0"
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "2000000"
     }
 
     @Test(description="Negative: Transfer negative amount of tokens to Delegate",groups = ["transactions"])
     public void transactions_API78(){
-        sendTransaction Node:allNodes.Delegates.Delegate2, Value:-5, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        sendTransaction Node:allNodes.Delegates.Delegate2, Value:"-5", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,DataStatus: "InvalidTransaction"
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 1000000
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "1000000"
     }
 
     @Test(description="Run exact same transactions body",groups = ["transactions"])
     public void transactions_API76(){
-        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:999, PrivateKey:"Genesis",
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"999", PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 999
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "999"
 
         def time = System.currentTimeMillis()
         response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
@@ -129,114 +129,114 @@ class RegressionTransactions {
 
         println("Sending same transaction again.")
         sleep(1000)
-        sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        sendTransaction Node:allNodes.Delegates.Delegate2, Value:"15", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Time:time,Status: "StatusAlreadyProcessingTransaction"
         sleep(2000)
         //waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate1, Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 15
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 984
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "15"
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "984"
 
     }
 
     @Test(description="Negative: To value is empty string",groups = ["transactions"])
     public void transactions_API110(){
-        def response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:1, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        def response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:"1", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:"" ,From: allNodes.Delegates.Delegate0.address
         response.Response.then().statusCode(400).assertThat().body("status",equalTo("InvalidTransaction"))
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 1000000
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "1000000"
     }
 
     @Test(description="Negative: From value is empty string",groups = ["transactions"])
     public void transactions_API111(){
-        sendTransaction Node:allNodes.Delegates.Delegate2, Value:1, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        sendTransaction Node:allNodes.Delegates.Delegate2, Value:"1", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: "",Status: "InvalidTransaction"
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 1000000
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "1000000"
     }
 
     @Test(description="Negative: Time value 1 year in the past",groups = ["transactions"])
     public void transactions_API68(){
-        sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        sendTransaction Node:allNodes.Delegates.Delegate2, Value:"15", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,Time: -1500108301994,Status: "StatusJsonParseError: transaction time cannot be negative"
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 1000000
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "1000000"
     }
 
     @Test(description="Negative: Time value 1 year in the future",groups = ["transactions"])
     public void transactions_API67(){
-        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:999, PrivateKey:"Genesis",
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"999", PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis",Status:"StatusJsonParseError: transaction time cannot be this far in the future (Ahead by:",Time: System.currentTimeMillis()+30000000000
     }
 
     @Test(description="Negative: Time value 5 secs in the future",groups = ["transactions"])
     public void transactions_API115(){
-        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:999, PrivateKey:"Genesis",
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"999", PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
         sleep(5000)
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 1000999
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "1000999"
 
-        response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:"15", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,Time: System.currentTimeMillis()+5000//,Status: "StatusJsonParseError: transaction time cannot be in the future"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,Status: "Ok", Timeout: 20
         sleep(5000)
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 1000984
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "1000984"
     }
 
     @Test(description="Negative: From and To is the same wallet token transaction",groups = ["transactions"])
     public void transactions_API114(){
-        sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        sendTransaction Node:allNodes.Delegates.Delegate2, Value:"15", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate0.address ,From: allNodes.Delegates.Delegate0.address,Status: "InvalidTransaction"
         sleep(2000)
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 1000000
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "1000000"
     }
 
     @Test(description="Negative: Try to do same transaction from 2 different nodes at ones",groups = ["transactions"])
     public void transactions_API116(){
-        sendTransaction Node:allNodes.Delegates.Delegate1, Value:1, PrivateKey:"Genesis",
+        sendTransaction Node:allNodes.Delegates.Delegate1, Value:"1", PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
 
-        def request1 = sendTransaction Node:allNodes.Delegates.Delegate1, Value:1000000, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        def request1 = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"1000000", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,ReturnRequest:true
 
-        def request2 = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1000000, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        def request2 = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"1000000", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,ReturnRequest:true
 
         request1.post("/v1/transactions")
         request2.post("/v1/transactions")
 
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 2000000
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 0
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "2000000"
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "0"
     }
 
     @Test(description="Negative: Try to do same transaction from 2 different nodes at ones with same time",groups = ["transactions"])
     public void transactions_API117(){
-        sendTransaction Node:allNodes.Delegates.Delegate1, Value:1, PrivateKey:"Genesis",
+        sendTransaction Node:allNodes.Delegates.Delegate1, Value:"1", PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         def time = System.currentTimeMillis()
 
-        sendTransaction Node:allNodes.Delegates.Delegate1, Value:1, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        sendTransaction Node:allNodes.Delegates.Delegate1, Value:"1", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,Time:time
 
-        sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        sendTransaction Node:allNodes.Delegates.Delegate0, Value:"1", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,Time:time
 
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 1000001
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 1000000
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "1000001"
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "1000000"
     }
 
     @Test(description="Negative: Try to do same transaction from 2 different nodes at ones then try to spend them",groups = ["transactions"])
     public void transactions_API118(){
         def wallet1 = createWallet()
-        sendTransaction Node:allNodes.Delegates.Delegate1, Value:1000000, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        sendTransaction Node:allNodes.Delegates.Delegate1, Value:"1000000", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
 
-        sendTransaction Node:allNodes.Delegates.Delegate0, Value:1000000, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        sendTransaction Node:allNodes.Delegates.Delegate0, Value:"1000000", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
 
-        sendTransaction Node:allNodes.Delegates.Delegate0, Value:2000000, PrivateKey:allNodes.Delegates.Delegate1.privateKey,
+        sendTransaction Node:allNodes.Delegates.Delegate0, Value:"2000000", PrivateKey:allNodes.Delegates.Delegate1.privateKey,
                 To:wallet1.Address ,From: allNodes.Delegates.Delegate1.address
 
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 1000000
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 0
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "1000000"
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "0"
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:wallet1.address,Status: "NotFound"
     }
 
@@ -244,7 +244,7 @@ class RegressionTransactions {
     public void transactions_API119(){
         def newAccount = Utils.createAccount()
 
-        sendTransaction Node:allNodes.Delegates.Delegate0, Value:99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999, PrivateKey:"Genesis",
+        sendTransaction Node:allNodes.Delegates.Delegate0, Value:"99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999", PrivateKey:"Genesis",
                 To:newAccount.address ,From: "Genesis",Status: "InvalidTransaction"
     }
 
@@ -254,11 +254,11 @@ class RegressionTransactions {
         def balance = 0
         10.times{
             balance++
-            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"1", PrivateKey:"Genesis",
                     To:newAccount.address ,From: "Genesis"
             waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
             sleep(5000)
-            verifyConsensusForAccount Nodes:allNodes.Delegates, ID:newAccount.address,Status: "Ok", Balance: balance
+            verifyConsensusForAccount Nodes:allNodes.Delegates, ID:newAccount.address,Status: "Ok", Balance: balance.toString()
         }
     }
 
@@ -268,10 +268,10 @@ class RegressionTransactions {
         def balance = 0
         10.times{
             balance++
-            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"1", PrivateKey:"Genesis",
                     To:newAccount.address ,From: "Genesis"
             waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
-            verifyConsensusForAccount Nodes:allNodes.Delegates, ID:newAccount.address,Status: "Ok", Balance: balance
+            verifyConsensusForAccount Nodes:allNodes.Delegates, ID:newAccount.address,Status: "Ok", Balance: balance.toString()
             allNodes.Delegates.each{key,value->
                 value.disgoProc.destroy()
                 sleep 1000
@@ -289,7 +289,7 @@ class RegressionTransactions {
         sleep(10000)
         5.times{
             balance++
-            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"1", PrivateKey:"Genesis",
                     To:newAccount.address ,From: "Genesis"
             transactions.add(0,response.Hash)
             waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 20
@@ -297,7 +297,7 @@ class RegressionTransactions {
 
         allNodes.Delegates.Delegate3.startProcess()
         sleep(15000)
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:newAccount.address,Status: "Ok", Balance: balance
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:newAccount.address,Status: "Ok", Balance: balance.toString()
         def transactionsFromNode = getTransactions(Node:allNodes.Delegates.Delegate3,Page: 1)
         assert transactionsFromNode.size() == 6
         transactionsFromNode.eachWithIndex {trans,index->
@@ -306,67 +306,46 @@ class RegressionTransactions {
     }
 
 
-    @Test(description="Genesis to Delegate token transfer",groups = ["transactions"])
-    public void transactions_APItest(){
-        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"999", PrivateKey:"Genesis",
-                To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
-        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 999
-
-        response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
-                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
-        sleep(1000)
-        def response2 = sendTransaction Node:allNodes.Delegates.Delegate2, Value:40, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
-                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
-        sleep(1000)
-        verifyQueue Node:allNodes.Delegates.Delegate2
-        println(response.Hash)
-        println(response2)
-        //waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,DataStatus: "Ok", Timeout: 10
-        //verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 15
-        //verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 984
-    }
-
     @Test(description="Negative: Try to do send transactions in incorrect order",groups = ["transactions"])
     public void transactions_API123(){
         def time = System.currentTimeMillis()
 
-        def request1 = sendTransaction Node:allNodes.Delegates.Delegate1, Value:1000000, PrivateKey:allNodes.Delegates.Delegate1.privateKey,
+        def request1 = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"1000000", PrivateKey:allNodes.Delegates.Delegate1.privateKey,
                 To:allNodes.Delegates.Delegate0.address ,From: allNodes.Delegates.Delegate1.address,ReturnRequest:true,Time:time
-        def request2 = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1000000, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        def request2 = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"1000000", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,ReturnRequest:true,Time:time+100
 
         request2.post("/v1/transactions")
         sleep(200)
         request1.post("/v1/transactions")
 
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 2000000
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 0
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "2000000"
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "0"
     }
 
     @Test(description="Send 2 transactions with same timestamp",groups = ["transactions"])
     public void transactions_API124(){
         def time = System.currentTimeMillis()
-        sendTransaction Node:allNodes.Delegates.Delegate1, Value:1, PrivateKey:"Genesis",
+        sendTransaction Node:allNodes.Delegates.Delegate1, Value:"1", PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis",Time: time
-        def trans2 = sendTransaction Node:allNodes.Delegates.Delegate1, Value:1, PrivateKey:"Genesis",
+        def trans2 = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"1", PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate1.address ,From: "Genesis",Time: time
         waitForTransactionStatus ID:trans2.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
 
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: 1000001
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 1000001
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "1000001"
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "1000001"
     }
 
     @Test(description="Shutdown seed, try transaction",groups = ["transactions"])
     public void transactions_API125(){
         allNodes.Seeds.Seed0.disgoProc.destroy()
         sleep(1000)
-        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"1", PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
 
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0,DataStatus: "Ok", Timeout: 10
 
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: 1000001
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "1000001"
     }
 
     @Test(description="Negative: Change delegate address see if transaction goes through",groups = ["transactions"])
@@ -380,7 +359,7 @@ class RegressionTransactions {
         allNodes.Delegates.Delegate0.startProcess()
         sleep(2000)
         try{
-            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"1", PrivateKey:"Genesis",
                     To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         }
         catch (java.net.ConnectException ex){
@@ -424,7 +403,7 @@ class RegressionTransactions {
         sleep(2000)
 
         try{
-            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"1", PrivateKey:"Genesis",
                     To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         }
         catch (java.net.ConnectException ex){
@@ -450,7 +429,7 @@ class RegressionTransactions {
         sleep(2000)
 
         try{
-            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"1", PrivateKey:"Genesis",
                     To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         }
         catch (java.net.ConnectException ex){
@@ -479,7 +458,7 @@ class RegressionTransactions {
         sleep(2000)
 
         try{
-            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"1", PrivateKey:"Genesis",
                     To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         }
         catch (java.net.ConnectException ex){
@@ -505,7 +484,7 @@ class RegressionTransactions {
     public void transactions_API131(){
         def transactions = []
         11.times{
-            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"1", PrivateKey:"Genesis",
                     To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
             transactions.add(0,response.Hash)
             //transactions << response.Hash
@@ -528,7 +507,7 @@ class RegressionTransactions {
         101.times{
             def wallet = createWallet()
             accounts.add(0,wallet)
-            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:1, PrivateKey:"Genesis",
+            def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"1", PrivateKey:"Genesis",
                     To:wallet.Address ,From: "Genesis"
             sleep(1)
         }
@@ -699,6 +678,21 @@ class RegressionTransactions {
         assert transaction.receipt.status == "CouldNotReachConsensus","Error: transactions should have status of CouldNotReachConsensus."
     }
 
+    @Test(description="Invalid token string value",groups = ["transactions"])
+    public void transactions_API101a(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"asdf", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Status: "StatusJsonParseError: value for field 'value' must be convertable to an integer"
+    }
+    @Test(description="Invalid token string value",groups = ["transactions"])
+    public void transactions_API101b(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"234 33", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Status: "StatusJsonParseError: value for field 'value' must be convertable to an integer"
+    }
+    @Test(description="Invalid token string value",groups = ["transactions"])
+    public void transactions_API101c(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"0.123", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Status: "InvalidTransaction"
+    }
     /*
     @Test(description="Decimal point tokens",groups = ["smoke", "transactions"])
     public void transactionRegression6_DelegateDecimalTokens(){
