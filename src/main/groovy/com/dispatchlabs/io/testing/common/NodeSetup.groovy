@@ -96,7 +96,10 @@ class NodeSetup {
                 "seeds": allSeeds,
                 //delegates:[],
                 isBookkeeper:true,
-                "genesisTransaction":genTransaction
+                "genesisTransaction":genTransaction,
+                rateLimits:[
+                        "minTTL": 10000000000,
+                ]
         ]
 //            if(setup.IsDelegate){
 //                config."seedAddresses" = seedAddresses

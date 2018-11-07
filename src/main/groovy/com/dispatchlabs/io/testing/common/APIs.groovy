@@ -183,7 +183,7 @@ class APIs {
     }
 
     public static verifyConsensusForAccount(def params){
-        sleep(10000)
+        if(!params.SkipWait == true) sleep(10000)
         params.Nodes.each{Name,Node->
             RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
             request.baseUri("http://"+Node.IP+":"+Node.HttpPort)
