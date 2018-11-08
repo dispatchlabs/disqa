@@ -99,6 +99,8 @@ class NodeSetup {
                 "genesisTransaction":genTransaction,
                 rateLimits:[
                         "minTTL": 10000000000,
+                        "txPerMinute": 10,
+                        avgHzPerTxn:10
                 ]
         ]
 //            if(setup.IsDelegate){
