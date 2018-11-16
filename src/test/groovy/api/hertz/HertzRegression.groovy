@@ -154,4 +154,22 @@ class HertzRegression {
 
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "InsufficientHertz", Timeout: 10
     }
+
+    @Test(description="Deploy smart contract verify hertz.",groups = ["hertz"])
+    public void HertzTransaction_API7h(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:1900000, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"0",From:allNodes.Delegates.Delegate0.address,To:"", PrivateKey:allNodes.Delegates.Delegate0.privateKey,Type:1,
+                Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
+        response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Hertz: "1866000"
+    }
+
+    @Test(description="Deploy smart contract without enough hertz.",groups = ["hertz"])
+    public void HertzTransaction_API8h(){
+         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"0",From:allNodes.Delegates.Delegate0.address,To:"", PrivateKey:allNodes.Delegates.Delegate0.privateKey,Type:1,
+                Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "InsufficientHertz", Timeout: 10
+    }
 }
