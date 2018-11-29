@@ -194,7 +194,7 @@ class APIs {
             if(params.Hertz)
                 response.then().assertThat().body("data.hertzAvailable",equalTo(params.Hertz))
             if(params.Balance)
-                response.then().assertThat().body("data.balance",equalTo(params.Balance))
+                response.then().assertThat().body("data.balance",equalTo(params.Balance.toString()))
         }
     }
 

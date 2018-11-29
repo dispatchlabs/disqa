@@ -2,6 +2,7 @@ package api.transactions
 
 import com.dispatchlabs.io.testing.common.NodeSetup
 import com.jayway.restassured.RestAssured
+import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Response
 import com.jayway.restassured.specification.RequestSpecification
 import org.testng.annotations.Test
@@ -47,12 +48,28 @@ class MonkeyTest {
     @Test(description="Do trade between wallets at random intervals with random values until you stop it.",groups = ["load"])
     public void test(){
         allNodes = NodeSetup.quickSetup Delegate: 4,Seed: 1,Regular: 0
+        /*RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
+        request.baseUri("http://35.203.143.69:1975")
+        Response responseDel = request.get("/v1/delegates")
+        responseDel.then().log().all()
+        def delegates = responseDel.then().extract().path("data")
+        allNodes = [:]
+        allNodes.Delegates = [:]
+        delegates.eachWithIndex{delegate,index->
+            allNodes.Delegates."Delegate$index" = [
+                    "IP": delegate.httpEndpoint.host,
+                    "HttpPort": delegate.httpEndpoint.port,
+                    address:delegate.address
+            ]
+        }
+        */
+
         def wallets = []
         allNodes.Delegates.each {key,value->
             //give each wallet enough tokens
             def response = sendTransaction Node:value, Value:1000000, PrivateKey:"Genesis",
                     To:value.address ,From: "Genesis"
-            waitForTransactionStatus ID:response.Hash ,Node:value, Status: "Ok", Timeout: 10
+            waitForTransactionStatus ID:response.Hash ,Node:value, DataStatus: "Ok", Timeout: 10
 
             def wallet = new Wallet()
             wallet.allNodes = allNodes.Delegates
