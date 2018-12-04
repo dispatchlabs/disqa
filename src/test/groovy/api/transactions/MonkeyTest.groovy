@@ -47,22 +47,24 @@ class MonkeyTest {
 
     @Test(description="Do trade between wallets at random intervals with random values until you stop it.",groups = ["load"])
     public void test(){
-        allNodes = NodeSetup.quickSetup Delegate: 4,Seed: 1,Regular: 0
-        /*RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
-        request.baseUri("http://35.203.143.69:1975")
+        //allNodes = NodeSetup.quickSetup Delegate: 4,Seed: 1,Regular: 0
+        RequestSpecification request = RestAssured.given().contentType(ContentType.JSON).log().all()
+        request.baseUri("http://35.233.212.74:1975")
         Response responseDel = request.get("/v1/delegates")
         responseDel.then().log().all()
         def delegates = responseDel.then().extract().path("data")
         allNodes = [:]
         allNodes.Delegates = [:]
         delegates.eachWithIndex{delegate,index->
+            def wallet = createWallet()
             allNodes.Delegates."Delegate$index" = [
                     "IP": delegate.httpEndpoint.host,
                     "HttpPort": delegate.httpEndpoint.port,
-                    address:delegate.address
+                    address:wallet.Address,
+                    privateKey:wallet.PrivateKey
             ]
         }
-        */
+
 
         def wallets = []
         allNodes.Delegates.each {key,value->
@@ -146,6 +148,8 @@ public class Wallet extends Thread  {
                     def toNode = randomNode()
                     def response = sendTransaction Node:node, Value:1, PrivateKey:node.privateKey,
                             To:toNode.address ,From: node.address
+//                    def response = sendTransaction Node:node, Value:1, PrivateKey:"Genesis",
+//                            To:toNode.address ,From: "Genesis"
                     def transID = response.Hash
                     waitForTransactionStatus ID: transID,Node:node, DataStatus: "Ok", Timeout: 40
                     ledger.add([NodeID:node.nodeID,Amount:-1,TransID:transID])
