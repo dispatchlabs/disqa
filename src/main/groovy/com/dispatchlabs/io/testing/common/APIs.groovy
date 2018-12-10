@@ -45,7 +45,7 @@ class APIs {
         def code = ""
         def method = ""
         def abi = ""
-        def paramsToContract = null
+        def paramsToContract = ""
         def hertz = 0
         def fromName = ""
         def toName = ""
@@ -68,6 +68,7 @@ class APIs {
         byteArrayOutputStream.write(DatatypeConverter.parseHexBinary(code));
         //byteArrayOutputStream.write(abi.getBytes("UTF-8"));
         byteArrayOutputStream.write(method.getBytes("UTF-8"));
+        byteArrayOutputStream.write(paramsToContract.getBytes("UTF-8"));
         //byteArrayOutputStream.write(code.getBytes());
         byteArrayOutputStream.write(Utils.longToBytes(time));
 
@@ -274,7 +275,8 @@ class APIs {
         for (int i=0; i<address.length; i++) {
             address[i] = hash[i+12];
         }
-
+        println("PrivateKey: "+key.getPrivateKey())
+        println("Address: "+Utils.toHexString(address))
         return [Address:Utils.toHexString(address),PrivateKey:key.getPrivateKey()];
     }
 

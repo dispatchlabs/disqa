@@ -97,7 +97,8 @@ class NodeSetup {
                 isBookkeeper:true,
                 //"genesisTransaction":genTransaction,
                 rateLimits:[
-                        "minTTL": 10000000000,
+                        //"minTTL": 10000000000,
+                        "minTTL": 20000000000,
                         "txPerMinute": 10,
                         avgHzPerTxn:10
                 ]

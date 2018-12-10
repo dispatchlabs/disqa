@@ -1,6 +1,7 @@
 package api.hertz
 
 import com.dispatchlabs.io.testing.common.NodeSetup
+import com.dispatchlabs.io.testing.common.contracts.ComplexContract
 import com.dispatchlabs.io.testing.common.contracts.DefaultSampleContract
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
@@ -172,4 +173,124 @@ class HertzRegression {
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "InsufficientHertz", Timeout: 10
     }
+
+    @Test(description="Get contract value",groups = ["smart contract"])
+    public void SmartContract_API22222(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"1900000", PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+        response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "1900000"
+        //sleep(10000)
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"0",From:allNodes.Delegates.Delegate0.address,To:"", PrivateKey:allNodes.Delegates.Delegate0.privateKey,Type:1,
+                Code:ComplexContract.contract2,ABI: ComplexContract.abi2
+        response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok"//, Hertz: "1866000"
+
+
+        /*def contractAddress = response.then().extract().path("data.receipt.contractAddress")
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"0",From:allNodes.Delegates.Delegate0.address,To:contractAddress, PrivateKey:allNodes.Delegates.Delegate0.privateKey,Type:2,
+                ABI: ComplexContract.abi2,
+                Method: "getMultiReturn",Params: []
+        def getID = response.Hash
+        //waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        sleep(500)
+        //verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,SkipWait:true)
+        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok"*/
+        /*response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"0",From:allNodes.Delegates.Delegate0.address,To:contractAddress, PrivateKey:allNodes.Delegates.Delegate0.privateKey,Type:2,
+                ABI: ComplexContract.abi2,
+                Method: "getMultiReturn",Params: []
+        getID = response.Hash
+        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,SkipWait:true)
+        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok"*/
+        println("denis account")
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok"
+        println("denis loop")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"0",From:allNodes.Delegates.Delegate0.address,To:contractAddress, PrivateKey:allNodes.Delegates.Delegate0.privateKey,Type:2,
+                ABI: ComplexContract.abi2,
+                Method: "infiniteLoop",Params: "[]"
+        def getID = response.Hash
+        sleep(4000)
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok",SkipWait:true
+        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        //verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["aaaaaaaaaaaaa"])
+        //, Hertz: 1000000
+    }
+
+    @Test(description="Get contract value",groups = ["smart contract"])
+    public void SmartContract_API33333(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"900000", PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+        response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "900000"
+        //sleep(10000)
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"0",From:allNodes.Delegates.Delegate0.address,To:"", PrivateKey:allNodes.Delegates.Delegate0.privateKey,Type:1,
+                Code:ComplexContract.contract2,ABI: ComplexContract.abi2
+        response = waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        println("before method")
+        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok"//, Hertz: "1866000"
+
+
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"0",From:allNodes.Delegates.Delegate0.address,To:contractAddress, PrivateKey:allNodes.Delegates.Delegate0.privateKey,Type:2,
+                ABI: ComplexContract.abi2,
+                Method: "getMultiReturn",Params: "[]"
+        def getID = response.Hash
+        //waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        //sleep(1000)
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"0",From:allNodes.Delegates.Delegate0.address,To:contractAddress, PrivateKey:allNodes.Delegates.Delegate0.privateKey,Type:2,
+                ABI: ComplexContract.abi2,
+                Method: "getMultiReturn",Params: "[]"
+        getID = response.Hash/*
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"0",From:allNodes.Delegates.Delegate0.address,To:contractAddress, PrivateKey:allNodes.Delegates.Delegate0.privateKey,Type:2,
+                ABI: ComplexContract.abi2,
+                Method: "getMultiReturn",Params: "[]"
+        getID = response.Hash*/
+        //println("verify shit")
+        //sleep(1000)
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,SkipWait:true)
+        //sleep(2000)
+        println("after method")
+        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok"
+        sleep(10000)
+        println("wait some more")
+        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok"
+        /*response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"0",From:allNodes.Delegates.Delegate0.address,To:contractAddress, PrivateKey:allNodes.Delegates.Delegate0.privateKey,Type:2,
+                ABI: ComplexContract.abi2,
+                Method: "getMultiReturn",Params: []
+        getID = response.Hash
+        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,SkipWait:true)
+        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok"*/
+        /*println("denis account")
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok"
+        println("denis loop")
+        def contractAddress = response.then().extract().path("data.receipt.contractAddress")
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"0",From:allNodes.Delegates.Delegate0.address,To:contractAddress, PrivateKey:allNodes.Delegates.Delegate0.privateKey,Type:2,
+                ABI: ComplexContract.abi2,
+                Method: "infiniteLoop",Params: "[]"
+        def getID = response.Hash
+        sleep(4000)
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok",SkipWait:true
+        waitForTransactionStatus ID:getID ,Node:allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10*/
+        //verifyStatusForTransaction(Nodes:[allNodes.Delegates.Delegate0],ID:getID,ContractResult:["aaaaaaaaaaaaa"])
+        //, Hertz: 1000000
+    }
+    @Test(description="Negative: Try to deploy contract without enough hertz",groups = ["smart contract"])
+    public void SmartContract_API4444() {
+        def response = sendTransaction Node: allNodes.Delegates.Delegate1, Value: "90000", PrivateKey: "Genesis",
+                To: allNodes.Delegates.Delegate0.address, From: "Genesis"
+        response = waitForTransactionStatus ID: response.Hash, Node: allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes: allNodes.Delegates, ID: allNodes.Delegates.Delegate0.address, Status: "Ok", Balance: "90000"
+        //sleep(10000)
+        response = sendTransaction Node: allNodes.Delegates.Delegate0, Value: "0", From: allNodes.Delegates.Delegate0.address, To: "", PrivateKey: allNodes.Delegates.Delegate0.privateKey, Type: 1,
+                Code: ComplexContract.contract2, ABI: ComplexContract.abi2
+        //response = waitForTransactionStatus ID: response.Hash, Node: allNodes.Delegates.Delegate0, DataStatus: "Ok", Timeout: 10
+        sleep(10000)
+        println("before method")
+        verifyConsensusForAccount SkipWait: true, Nodes: allNodes.Delegates, ID: allNodes.Delegates.Delegate0.address, Status: "Ok"
+        //, Hertz: "1866000"
+    }
+
 }

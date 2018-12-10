@@ -204,7 +204,7 @@ class RegressionTransactions {
         request2.post("/v1/transactions")
 
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "2000000"
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "0"
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "1"
     }
 
     @Test(description="Negative: Try to do same transaction from 2 different nodes at ones with same time",groups = ["transactions"])
@@ -223,6 +223,7 @@ class RegressionTransactions {
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "1000000"
     }
 
+    /* NEEDS TO BE UPDATED!!
     @Test(description="Negative: Try to do same transaction from 2 different nodes at ones then try to spend them",groups = ["transactions"])
     public void transactions_API118(){
         def wallet1 = createWallet()
@@ -238,7 +239,7 @@ class RegressionTransactions {
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "1000000"
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "0"
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:wallet1.address,Status: "NotFound"
-    }
+    }*/
 
     @Test(description="Negative buffer overflow number of tokens",groups = ["transactions"])
     public void transactions_API119(){
@@ -663,7 +664,7 @@ class RegressionTransactions {
         assert transactionsGet.size() == 5
     }
 
-    @Test(description="",groups = ["transactions"])
+    @Test(description="Destroy all delegates but 1",groups = ["transactions"])
     public void transactions_API146(){
 
         allNodes.Delegates.Delegate1.disgoProc.destroy()
@@ -692,6 +693,14 @@ class RegressionTransactions {
     public void transactions_API101c(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"0.123", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Status: "InvalidTransaction"
+    }
+
+    @Test(description="TO and FROM are the same for token transaction",groups = ["transactions"])
+    public void transactions_API147(){
+        def response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:"999", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+                To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate1.address,HumanReadable:"from address cannot equal to address"
+        //waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,DataStatus: "Ok", Timeout: 10
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "1000000"
     }
     /*
     @Test(description="Decimal point tokens",groups = ["smoke", "transactions"])
