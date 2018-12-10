@@ -118,7 +118,7 @@ class HertzRegression {
 
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
         verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Hertz: "0"
-        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Hertz: "0"
+        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Hertz: "1"
     }
 
 
