@@ -66,7 +66,7 @@ class RegressionTransactions {
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate2,DataStatus: "Ok", Timeout: 10
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "10000000999"
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "9999990001"
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "9999999001"
     }
 
     @Test(description="All delegate tokens transferred",groups = ["transactions"])
