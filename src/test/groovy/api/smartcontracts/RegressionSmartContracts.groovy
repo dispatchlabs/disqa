@@ -17,13 +17,13 @@ class RegressionSmartContracts {
     public void baseState(){
         //create and start all needed nodes for each test
         allNodes = NodeSetup.quickSetup Delegate: 5,Seed: 1,Regular: 0
-        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"1000000", PrivateKey:"Genesis",
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"100000000000", PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
-        response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"1000000", PrivateKey:"Genesis",
+        response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"100000000000", PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate1.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
-        response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"1000000", PrivateKey:"Genesis",
+        response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"100000000000", PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate2.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
     }
