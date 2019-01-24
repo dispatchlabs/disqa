@@ -45,29 +45,33 @@ class HertzRegression {
 
     @Test(description="Verify that wallet has same amount of hertz as tokens",groups = ["hertz"])
     public void HertzTransaction_API1h(){
-        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:9000, PrivateKey:"Genesis",
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:900000000, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Hertz: "9000"
+        sleep(21000)
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Hertz: "900000000"
     }
 
-    @Test(description="Verify that after transaction of 1 there are 18999 hertz available",groups = ["hertz"])
+    @Test(description="Verify that after transaction of 1 there are 100000008 hertz available",groups = ["hertz"])
     public void HertzTransaction_API2h(){
-        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:19000, PrivateKey:"Genesis",
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:1000000009, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Hertz: "19000"
+        //verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Hertz: "900000000"
 
-        response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:19000, PrivateKey:"Genesis",
+        response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:1000000009, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate1.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
+
+        sleep(21000)
 
         response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:1, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
 
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
-        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Hertz: "9999"
-        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Hertz: "10001"
+        sleep(2000)
+        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Hertz: "100000008"
+        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Hertz: "100000010"
     }
 
     @Test(description="Verify that after transaction",groups = ["hertz"])
@@ -104,15 +108,16 @@ class HertzRegression {
 
     @Test(description="Verify that minimum number of tokens can be traded.",groups = ["hertz"])
     public void HertzTransaction_API4h(){
-        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:9000, PrivateKey:"Genesis",
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:900000000, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Hertz: "9000"
+        //verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Hertz: "900000000"
 
-        response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:9000, PrivateKey:"Genesis",
+        response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:900000000, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate1.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
 
+        sleep(10000)
         response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:1, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
 
@@ -124,33 +129,34 @@ class HertzRegression {
 
     @Test(description="Verify that hertz are given back.",groups = ["hertz"])
     public void HertzTransaction_API5h(){
-        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:19000, PrivateKey:"Genesis",
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:900000000, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Hertz: "19000"
+        //verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Hertz: "900000000"
 
-        response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:19000, PrivateKey:"Genesis",
+        response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:900000000, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate1.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
 
+        sleep(10000)
         response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:1, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
-
+        sleep(33000)
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
-        sleep(12000)
-        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Hertz: "18999"
-        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Hertz: "19001"
+        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Hertz: "899999999"
+        verifyConsensusForAccount SkipWait:true, Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Hertz: "900000001"
     }
 
 
     @Test(description="Verify that InsufficientHertz status is reported if trade exceeds your hertz.",groups = ["hertz"])
     public void HertzTransaction_API6h(){
-        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:19000, PrivateKey:"Genesis",
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:990000000, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Hertz: "19000"
+        sleep(10000)
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Hertz: "990000000"
 
-        response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:19000, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:990000000, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address
 
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "InsufficientHertz", Timeout: 10
@@ -169,7 +175,11 @@ class HertzRegression {
 
     @Test(description="Deploy smart contract without enough hertz.",groups = ["hertz"])
     public void HertzTransaction_API8h(){
-         def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"0",From:allNodes.Delegates.Delegate0.address,To:"", PrivateKey:allNodes.Delegates.Delegate0.privateKey,Type:1,
+        def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:9000000, PrivateKey:"Genesis",
+                To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
+        sleep(10000)
+        response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"0",From:allNodes.Delegates.Delegate0.address,To:"", PrivateKey:allNodes.Delegates.Delegate0.privateKey,Type:1,
                 Code:DefaultSampleContract.defaultSample,ABI: DefaultSampleContract.defaultSampleABI
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate0, DataStatus: "InsufficientHertz", Timeout: 10
     }

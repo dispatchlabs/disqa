@@ -115,7 +115,7 @@ class RegressionTransactions {
     public void transactions_API78(){
         sendTransaction Node:allNodes.Delegates.Delegate2, Value:"-5", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,DataStatus: "InvalidTransaction"
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "1000000000"
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "10000000000"
     }
 
     @Test(description="Run exact same transactions body",groups = ["transactions"])
@@ -123,10 +123,10 @@ class RegressionTransactions {
         def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"999", PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "999"
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "10000000999"
 
         def time = System.currentTimeMillis()
-        response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:15, PrivateKey:allNodes.Delegates.Delegate0.privateKey,
+        response = sendTransaction Node:allNodes.Delegates.Delegate2, Value:"15", PrivateKey:allNodes.Delegates.Delegate0.privateKey,
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Time:time
 
         println("Sending same transaction again.")
@@ -135,8 +135,8 @@ class RegressionTransactions {
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address, Time:time,Status: "StatusAlreadyProcessingTransaction"
         sleep(2000)
         //waitForTransactionStatus ID:response.then().extract().path("id") ,Node:allNodes.Delegates.Delegate1, Timeout: 10
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "15"
-        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "984"
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "10000000015"
+        verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate0.address,Status: "Ok", Balance: "10000000984"
 
     }
 
@@ -319,7 +319,8 @@ class RegressionTransactions {
                 To:allNodes.Delegates.Delegate1.address ,From: allNodes.Delegates.Delegate0.address,ReturnRequest:true,Time:time+100
 
         request2.post("/v1/transactions")
-        sleep(200)
+        //sleep(200)
+        sleep(1000)
         request1.post("/v1/transactions")
 
         verifyConsensusForAccount Nodes:allNodes.Delegates, ID:allNodes.Delegates.Delegate1.address,Status: "Ok", Balance: "20000000000"
@@ -615,6 +616,7 @@ class RegressionTransactions {
             def response = sendTransaction Node:allNodes.Delegates.Delegate0, Value:"999", PrivateKey:"Genesis",
                     To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
             transactions.add(0,response.Hash)
+            sleep(2000)
         }
         sleep(10000)
         def transactionsFrom = getTransactionsFrom(Node:allNodes.Delegates.Delegate0,From:NodeSetup.genAddress,Page: 1)
@@ -623,7 +625,7 @@ class RegressionTransactions {
             assert trans.hash == transactions[index]
         }
         transactionsFrom = getTransactions(Node:allNodes.Delegates.Delegate0,From:NodeSetup.genAddress,Page: 2)
-        assert transactionsFrom.size() == 1
+        assert transactionsFrom.size() == 6
         assert transactionsFrom[0].hash == transactions[10]
 
     }
@@ -644,7 +646,7 @@ class RegressionTransactions {
             assert trans.hash == transactions[index]
         }
         transactionsTo = getTransactionsTo(Node:allNodes.Delegates.Delegate0,To:allNodes.Delegates.Delegate0.address,Page: 2)
-        assert transactionsTo.size() == 1
+        assert transactionsTo.size() == 6
         assert transactionsTo[0].hash == transactions[10]
 
     }
