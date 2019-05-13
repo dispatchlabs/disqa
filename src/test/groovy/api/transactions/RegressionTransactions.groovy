@@ -17,7 +17,9 @@ class RegressionTransactions {
     @BeforeMethod(alwaysRun = true)
     public void baseState(){
         //create and start all needed nodes for each test
-        allNodes = NodeSetup.quickSetup Delegate: 5,Seed: 1,Regular: 1
+        //allNodes = NodeSetup.quickSetup Delegate: 5,Seed: 1,Regular: 1
+        allNodes = NodeSetup.quickSetup Delegate: 3,Seed: 1,Regular: 0
+        //sleep(15000)
 
         def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"10000000000", PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
@@ -28,12 +30,12 @@ class RegressionTransactions {
         response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"10000000000", PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate2.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
-        response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"10000000000", PrivateKey:"Genesis",
+        /*response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"10000000000", PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate3.address ,From: "Genesis"
         waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
         response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:"10000000000", PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate4.address ,From: "Genesis"
-        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10
+        waitForTransactionStatus ID:response.Hash ,Node:allNodes.Delegates.Delegate1,DataStatus: "Ok", Timeout: 10*/
     }
 
     //@AfterMethod

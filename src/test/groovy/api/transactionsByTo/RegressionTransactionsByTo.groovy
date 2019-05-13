@@ -13,10 +13,10 @@ class RegressionTransactionsByTo {
     @BeforeMethod(alwaysRun = true)
     public void baseState(){
         //create and start all needed nodes for each test
-        allNodes = NodeSetup.quickSetup Delegate: 4,Seed: 1,Regular: 0
+        allNodes = NodeSetup.quickSetup Delegate: 3,Seed: 1,Regular: 0
     }
 
-    @Test(description="Check a token transaction by from",groups = ["smoke", "transactions by to"])
+    @Test(description="Check a token transaction by from",groups = ["transactions by to"])
     public void transactionsByTo_API82(){
         def response = sendTransaction Node:allNodes.Delegates.Delegate1, Value:999, PrivateKey:"Genesis",
                 To:allNodes.Delegates.Delegate0.address ,From: "Genesis"
